@@ -1,6 +1,6 @@
 {
   "name": "simplechecks",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The official TypeScript library for the Simplechecks API",
   "author": "Simplechecks <ryan@simplechecks.io>",
   "types": "dist/index.d.ts",

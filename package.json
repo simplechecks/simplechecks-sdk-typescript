@@ -2,7 +2,7 @@
   "name": "simplechecks",
   "version": "0.0.1",
   "description": "The official TypeScript library for the Simplechecks API",
-  "author": "Simplechecks <>",
+  "author": "Simplechecks <ryan@simplechecks.io>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",

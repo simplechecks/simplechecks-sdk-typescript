@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.4 (2026-04-29)
+
+Full Changelog: [v0.0.3...v0.0.4](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.0.3...v0.0.4)
+
+### Chores
+
+* update SDK settings ([99681e5](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/99681e55544aa41f93e936d75a515dc7eb403706))
+
 ## 0.0.3 (2026-04-29)
 
 Full Changelog: [v0.0.2...v0.0.3](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.0.2...v0.0.3)

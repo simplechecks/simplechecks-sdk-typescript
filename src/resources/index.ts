@@ -7,8 +7,22 @@ export {
   type CheckoutSession,
   type CheckoutSessionCreateParams,
 } from './checkout-sessions';
-export { Checks, type AlertConfig, type Check } from './checks/checks';
-export { Keys, type APIKey } from './keys';
+export {
+  Checks,
+  type AlertConfig,
+  type Check,
+  type CheckListResponse,
+  type CheckCreateParams,
+  type CheckUpdateParams,
+  type CheckListParams,
+} from './checks/checks';
+export {
+  Keys,
+  type APIKey,
+  type KeyCreateResponse,
+  type KeyListResponse,
+  type KeyCreateParams,
+} from './keys';
 export {
   Runs,
   type Aggregate,

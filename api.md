@@ -14,16 +14,28 @@ Types:
 
 - <code><a href="./src/resources/checks/checks.ts">AlertConfig</a></code>
 - <code><a href="./src/resources/checks/checks.ts">Check</a></code>
+- <code><a href="./src/resources/checks/checks.ts">CheckListResponse</a></code>
 
 Methods:
 
+- <code title="post /v1/checks">client.checks.<a href="./src/resources/checks/checks.ts">create</a>({ ...params }) -> Check</code>
+- <code title="get /v1/checks/{id}">client.checks.<a href="./src/resources/checks/checks.ts">retrieve</a>(id) -> Check</code>
+- <code title="patch /v1/checks/{id}">client.checks.<a href="./src/resources/checks/checks.ts">update</a>(id, { ...params }) -> Check</code>
+- <code title="get /v1/checks">client.checks.<a href="./src/resources/checks/checks.ts">list</a>({ ...params }) -> CheckListResponse</code>
 - <code title="delete /v1/checks/{id}">client.checks.<a href="./src/resources/checks/checks.ts">delete</a>(id) -> void</code>
 
 ## Alerts
 
+Types:
+
+- <code><a href="./src/resources/checks/alerts.ts">AlertTestFireResponse</a></code>
+
 Methods:
 
+- <code title="get /v1/checks/{id}/alerts">client.checks.alerts.<a href="./src/resources/checks/alerts.ts">retrieve</a>(id) -> AlertConfig</code>
 - <code title="delete /v1/checks/{id}/alerts">client.checks.alerts.<a href="./src/resources/checks/alerts.ts">delete</a>(id) -> void</code>
+- <code title="put /v1/checks/{id}/alerts">client.checks.alerts.<a href="./src/resources/checks/alerts.ts">replace</a>(id, { ...params }) -> AlertConfig</code>
+- <code title="post /v1/checks/{id}/alerts:test">client.checks.alerts.<a href="./src/resources/checks/alerts.ts">testFire</a>(id) -> AlertTestFireResponse</code>
 
 # Runs
 
@@ -47,9 +59,13 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/keys.ts">APIKey</a></code>
+- <code><a href="./src/resources/keys.ts">KeyCreateResponse</a></code>
+- <code><a href="./src/resources/keys.ts">KeyListResponse</a></code>
 
 Methods:
 
+- <code title="post /v1/keys">client.keys.<a href="./src/resources/keys.ts">create</a>({ ...params }) -> KeyCreateResponse</code>
+- <code title="get /v1/keys">client.keys.<a href="./src/resources/keys.ts">list</a>() -> KeyListResponse</code>
 - <code title="delete /v1/keys/{id}">client.keys.<a href="./src/resources/keys.ts">revoke</a>(id) -> void</code>
 
 # Balance

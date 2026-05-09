@@ -1,10 +1,10 @@
-# Simplechecks TypeScript API Library
+# Simple Checks TypeScript API Library
 
 [![NPM version](<https://img.shields.io/npm/v/simplechecks.svg?label=npm%20(stable)>)](https://npmjs.org/package/simplechecks) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/simplechecks)
 
-This library provides convenient access to the Simplechecks REST API from server-side TypeScript or JavaScript.
+This library provides convenient access to the Simple Checks REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [simplechecks.com](https://simplechecks.com). The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [api.simplechecks.com](https://api.simplechecks.com/docs). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -20,15 +20,15 @@ The full API of this library can be found in [api.md](api.md).
 
 <!-- prettier-ignore -->
 ```js
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 
-const client = new Simplechecks({
-  environment: 'environment_1', // defaults to 'production'
+const client = new SimpleChecks({
+  environment: 'local', // defaults to 'production'
 });
 
-const response = await client.healthz.check();
+const account = await client.account.retrieve();
 
-console.log(response.status);
+console.log(account.typeid);
 ```
 
 ### Request & Response types
@@ -37,13 +37,13 @@ This library includes TypeScript definitions for all request params and response
 
 <!-- prettier-ignore -->
 ```ts
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 
-const client = new Simplechecks({
-  environment: 'environment_1', // defaults to 'production'
+const client = new SimpleChecks({
+  environment: 'local', // defaults to 'production'
 });
 
-const response: Simplechecks.HealthzCheckResponse = await client.healthz.check();
+const account: SimpleChecks.Account = await client.account.retrieve();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -56,8 +56,8 @@ a subclass of `APIError` will be thrown:
 
 <!-- prettier-ignore -->
 ```ts
-const response = await client.healthz.check().catch(async (err) => {
-  if (err instanceof Simplechecks.APIError) {
+const account = await client.account.retrieve().catch(async (err) => {
+  if (err instanceof SimpleChecks.APIError) {
     console.log(err.status); // 400
     console.log(err.name); // BadRequestError
     console.log(err.headers); // {server: 'nginx', ...}
@@ -91,12 +91,12 @@ You can use the `maxRetries` option to configure or disable this:
 <!-- prettier-ignore -->
 ```js
 // Configure the default for all requests:
-const client = new Simplechecks({
+const client = new SimpleChecks({
   maxRetries: 0, // default is 2
 });
 
 // Or, configure per-request:
-await client.healthz.check({
+await client.account.retrieve({
   maxRetries: 5,
 });
 ```
@@ -108,12 +108,12 @@ Requests time out after 1 minute by default. You can configure this with a `time
 <!-- prettier-ignore -->
 ```ts
 // Configure the default for all requests:
-const client = new Simplechecks({
+const client = new SimpleChecks({
   timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
 // Override per-request:
-await client.healthz.check({
+await client.account.retrieve({
   timeout: 5 * 1000,
 });
 ```
@@ -134,15 +134,15 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 
 <!-- prettier-ignore -->
 ```ts
-const client = new Simplechecks();
+const client = new SimpleChecks();
 
-const response = await client.healthz.check().asResponse();
+const response = await client.account.retrieve().asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: response, response: raw } = await client.healthz.check().withResponse();
+const { data: account, response: raw } = await client.account.retrieve().withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(response.status);
+console.log(account.typeid);
 ```
 
 ### Logging
@@ -155,13 +155,13 @@ console.log(response.status);
 
 The log level can be configured in two ways:
 
-1. Via the `SIMPLECHECKS_LOG` environment variable
+1. Via the `SIMPLE_CHECKS_LOG` environment variable
 2. Using the `logLevel` client option (overrides the environment variable if set)
 
 ```ts
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 
-const client = new Simplechecks({
+const client = new SimpleChecks({
   logLevel: 'debug', // Show all log messages
 });
 ```
@@ -187,13 +187,13 @@ When providing a custom logger, the `logLevel` option still controls which messa
 below the configured level will not be sent to your logger.
 
 ```ts
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 import pino from 'pino';
 
 const logger = pino();
 
-const client = new Simplechecks({
-  logger: logger.child({ name: 'Simplechecks' }),
+const client = new SimpleChecks({
+  logger: logger.child({ name: 'SimpleChecks' }),
   logLevel: 'debug', // Send all messages to pino, allowing it to filter
 });
 ```
@@ -222,7 +222,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.healthz.check({
+client.account.retrieve({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
@@ -256,10 +256,10 @@ globalThis.fetch = fetch;
 Or pass it to the client:
 
 ```ts
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 import fetch from 'my-fetch';
 
-const client = new Simplechecks({ fetch });
+const client = new SimpleChecks({ fetch });
 ```
 
 ### Fetch options
@@ -267,9 +267,9 @@ const client = new Simplechecks({ fetch });
 If you want to set custom `fetch` options without overriding the `fetch` function, you can provide a `fetchOptions` object when instantiating the client or making a request. (Request-specific options override client options.)
 
 ```ts
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 
-const client = new Simplechecks({
+const client = new SimpleChecks({
   fetchOptions: {
     // `RequestInit` options
   },
@@ -284,11 +284,11 @@ options to requests:
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/node.svg" align="top" width="18" height="21"> **Node** <sup>[[docs](https://github.com/nodejs/undici/blob/main/docs/docs/api/ProxyAgent.md#example---proxyagent-with-fetch)]</sup>
 
 ```ts
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 import * as undici from 'undici';
 
 const proxyAgent = new undici.ProxyAgent('http://localhost:8888');
-const client = new Simplechecks({
+const client = new SimpleChecks({
   fetchOptions: {
     dispatcher: proxyAgent,
   },
@@ -298,9 +298,9 @@ const client = new Simplechecks({
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/bun.svg" align="top" width="18" height="21"> **Bun** <sup>[[docs](https://bun.sh/guides/http/proxy)]</sup>
 
 ```ts
-import Simplechecks from 'simplechecks';
+import SimpleChecks from 'simplechecks';
 
-const client = new Simplechecks({
+const client = new SimpleChecks({
   fetchOptions: {
     proxy: 'http://localhost:8888',
   },
@@ -310,10 +310,10 @@ const client = new Simplechecks({
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/deno.svg" align="top" width="18" height="21"> **Deno** <sup>[[docs](https://docs.deno.com/api/deno/~/Deno.createHttpClient)]</sup>
 
 ```ts
-import Simplechecks from 'npm:simplechecks';
+import SimpleChecks from 'npm:simplechecks';
 
 const httpClient = Deno.createHttpClient({ proxy: { url: 'http://localhost:8888' } });
-const client = new Simplechecks({
+const client = new SimpleChecks({
   fetchOptions: {
     client: httpClient,
   },

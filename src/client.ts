@@ -24,9 +24,18 @@ import {
   CheckoutSessionCreateParams,
   CheckoutSessions,
 } from './resources/checkout-sessions';
-import { Check, Checks } from './resources/checks';
 import { APIKey, Keys } from './resources/keys';
-import { Run, RunListParams, RunListResponse, Runs } from './resources/runs';
+import {
+  Aggregate,
+  Run,
+  RunAggregatesParams,
+  RunAggregatesResponse,
+  RunListParams,
+  RunListResponse,
+  RunLogsResponse,
+  Runs,
+} from './resources/runs';
+import { AlertConfig, Check, Checks } from './resources/checks/checks';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -774,13 +783,17 @@ export declare namespace SimpleChecks {
 
   export { AccountResource as AccountResource, type Account as Account };
 
-  export { Checks as Checks, type Check as Check };
+  export { Checks as Checks, type AlertConfig as AlertConfig, type Check as Check };
 
   export {
     Runs as Runs,
+    type Aggregate as Aggregate,
     type Run as Run,
     type RunListResponse as RunListResponse,
+    type RunAggregatesResponse as RunAggregatesResponse,
+    type RunLogsResponse as RunLogsResponse,
     type RunListParams as RunListParams,
+    type RunAggregatesParams as RunAggregatesParams,
   };
 
   export { Keys as Keys, type APIKey as APIKey };

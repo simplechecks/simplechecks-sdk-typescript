@@ -2,7 +2,10 @@
 
 import SimpleChecks from 'simplechecks';
 
-const client = new SimpleChecks({ baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010' });
+const client = new SimpleChecks({
+  apiKey: 'My API Key',
+  baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
+});
 
 describe('resource account', () => {
   test('retrieve', async () => {

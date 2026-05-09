@@ -23,12 +23,13 @@ The full API of this library can be found in [api.md](api.md).
 import SimpleChecks from 'simplechecks';
 
 const client = new SimpleChecks({
+  apiKey: process.env['SIMPLECHECKS_API_KEY'], // This is the default and can be omitted
   environment: 'local', // defaults to 'production'
 });
 
-const account = await client.account.retrieve();
+const checks = await client.checks.list();
 
-console.log(account.typeid);
+console.log(checks.checks);
 ```
 
 ### Request & Response types
@@ -40,6 +41,7 @@ This library includes TypeScript definitions for all request params and response
 import SimpleChecks from 'simplechecks';
 
 const client = new SimpleChecks({
+  apiKey: process.env['SIMPLECHECKS_API_KEY'], // This is the default and can be omitted
   environment: 'local', // defaults to 'production'
 });
 
@@ -222,7 +224,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.account.retrieve({
+client.checks.list({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',

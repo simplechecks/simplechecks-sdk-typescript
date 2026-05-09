@@ -11,6 +11,24 @@ import { path } from '../internal/utils/path';
  */
 export class Keys extends APIResource {
   /**
+   * Mints a fresh PAT for the caller's account. The plaintext token is returned
+   * **once**; clients must persist it before discarding the response. Empty `scopes`
+   * means the server applies its default scope set. Requires the `keys:write` scope.
+   */
+  create(body: KeyCreateParams, options?: RequestOptions): APIPromise<KeyCreateResponse> {
+    return this._client.post('/v1/keys', { body, ...options });
+  }
+
+  /**
+   * Returns every API key for the caller's account, including revoked ones. The
+   * plaintext token is never returned by this endpoint — only by POST /v1/keys at
+   * mint time. Requires the `keys:read` scope.
+   */
+  list(options?: RequestOptions): APIPromise<KeyListResponse> {
+    return this._client.get('/v1/keys', options);
+  }
+
+  /**
    * Marks the key revoked. Subsequent ext_authz checks reject requests authenticated
    * with this key. The row stays for audit. Requires the `keys:write` scope.
    */
@@ -53,6 +71,40 @@ export interface APIKey {
   revoked_at?: string;
 }
 
+export interface KeyCreateResponse {
+  key_id: string;
+
+  /**
+   * Full `sc_live_…` token. Returned once; not retrievable later. Clients MUST
+   * persist this before discarding the response.
+   */
+  plaintext_token: string;
+
+  prefix: string;
+}
+
+export interface KeyListResponse {
+  keys: Array<APIKey>;
+}
+
+export interface KeyCreateParams {
+  /**
+   * Operator/customer-facing label.
+   */
+  name: string;
+
+  /**
+   * Scope strings (e.g. `checks:read`). Empty = server applies its default set.
+   * Unknown scopes return InvalidArgument.
+   */
+  scopes?: Array<string>;
+}
+
 export declare namespace Keys {
-  export { type APIKey as APIKey };
+  export {
+    type APIKey as APIKey,
+    type KeyCreateResponse as KeyCreateResponse,
+    type KeyListResponse as KeyListResponse,
+    type KeyCreateParams as KeyCreateParams,
+  };
 }

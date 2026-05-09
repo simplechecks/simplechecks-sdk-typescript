@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type Simplechecks } from '../client';
+import { type SimpleChecks } from '../client';
 
 import { type PromiseOrValue } from '../internal/types';
 import { APIResponseProps, defaultParseResponse } from '../internal/parse';
@@ -11,13 +11,13 @@ import { APIResponseProps, defaultParseResponse } from '../internal/parse';
  */
 export class APIPromise<T> extends Promise<T> {
   private parsedPromise: Promise<T> | undefined;
-  #client: Simplechecks;
+  #client: SimpleChecks;
 
   constructor(
-    client: Simplechecks,
+    client: SimpleChecks,
     private responsePromise: Promise<APIResponseProps>,
     private parseResponse: (
-      client: Simplechecks,
+      client: SimpleChecks,
       props: APIResponseProps,
     ) => PromiseOrValue<T> = defaultParseResponse,
   ) {

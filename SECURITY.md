@@ -16,11 +16,11 @@ before making any information public.
 ## Reporting Non-SDK Related Security Issues
 
 If you encounter security issues that are not directly related to SDKs but pertain to the services
-or products provided by Simplechecks, please follow the respective company's security reporting guidelines.
+or products provided by Simple Checks, please follow the respective company's security reporting guidelines.
 
-### Simplechecks Terms and Policies
+### Simple Checks Terms and Policies
 
-Please contact ryan@simplechecks.io for any questions or concerns regarding the security of our services.
+Please contact security@simplechecks.com for any questions or concerns regarding the security of our services.
 
 ---
 

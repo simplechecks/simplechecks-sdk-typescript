@@ -42,4 +42,43 @@ describe('resource runs', () => {
       ),
     ).rejects.toThrow(SimpleChecks.NotFoundError);
   });
+
+  test('aggregates', async () => {
+    const responsePromise = client.runs.aggregates();
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('aggregates: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.runs.aggregates(
+        {
+          bucket: 'minute',
+          check_id: '182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e',
+          from: 0,
+          limit: 0,
+          location: 'location',
+          to: 0,
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(SimpleChecks.NotFoundError);
+  });
+
+  test('logs', async () => {
+    const responsePromise = client.runs.logs('run_sew2vlfw09vz231q9mz9al2ecd');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
 });

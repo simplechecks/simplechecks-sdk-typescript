@@ -108,7 +108,7 @@ export class PagePromise<
 }
 
 export interface OffsetResponse<Item> {
-  data: Array<Item>;
+  checks: Array<Item>;
 
   next_offset: number | null;
 }
@@ -120,7 +120,7 @@ export interface OffsetParams {
 }
 
 export class Offset<Item> extends AbstractPage<Item> implements OffsetResponse<Item> {
-  data: Array<Item>;
+  checks: Array<Item>;
 
   next_offset: number | null;
 
@@ -132,12 +132,12 @@ export class Offset<Item> extends AbstractPage<Item> implements OffsetResponse<I
   ) {
     super(client, response, body, options);
 
-    this.data = body.data || [];
+    this.checks = body.checks || [];
     this.next_offset = body.next_offset || null;
   }
 
   getPaginatedItems(): Item[] {
-    return this.data ?? [];
+    return this.checks ?? [];
   }
 
   nextPageRequestOptions(): PageRequestOptions | null {

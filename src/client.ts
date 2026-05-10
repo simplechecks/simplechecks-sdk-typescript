@@ -43,9 +43,9 @@ import {
   Check,
   CheckCreateParams,
   CheckListParams,
-  CheckListResponse,
   CheckUpdateParams,
   Checks,
+  ChecksOffset,
   MaintenanceWindow,
 } from './resources/checks/checks';
 import { type Fetch } from './internal/builtin-types';
@@ -861,7 +861,7 @@ export declare namespace SimpleChecks {
     type AlertConfig as AlertConfig,
     type Check as Check,
     type MaintenanceWindow as MaintenanceWindow,
-    type CheckListResponse as CheckListResponse,
+    type ChecksOffset as ChecksOffset,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,
     type CheckListParams as CheckListParams,

@@ -7,13 +7,13 @@ import { RequestOptions } from '../internal/request-options';
 /**
  * Account profile and balance.
  */
-export class Account extends APIResource {
+export class AccountResource extends APIResource {
   /**
    * Returns the account row stitched together with the cached billing balance and
    * the `paused` flag, so a single dashboard read fetches everything the customer's
    * home page needs. Requires the `account:read` scope.
    */
-  retrieve(options?: RequestOptions): APIPromise<AccountRetrieveResponse> {
+  retrieve(options?: RequestOptions): APIPromise<Account> {
     return this._client.get('/v1/account', options);
   }
 }
@@ -21,7 +21,7 @@ export class Account extends APIResource {
 /**
  * Account profile + cached billing balance. Returned by GET /v1/account.
  */
-export interface AccountRetrieveResponse {
+export interface Account {
   /**
    * Cached run-credit balance, in run-credit units.
    */
@@ -53,6 +53,6 @@ export interface AccountRetrieveResponse {
   typeid: string;
 }
 
-export declare namespace Account {
-  export { type AccountRetrieveResponse as AccountRetrieveResponse };
+export declare namespace AccountResource {
+  export { type Account as Account };
 }

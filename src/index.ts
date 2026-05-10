@@ -1,12 +1,13 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export { Simplechecks as default } from './client';
+export { SimpleChecks as default } from './client';
 
 export { type Uploadable, toFile } from './core/uploads';
 export { APIPromise } from './core/api-promise';
-export { Simplechecks, type ClientOptions } from './client';
+export { SimpleChecks, type ClientOptions } from './client';
+export { PagePromise } from './core/pagination';
 export {
-  SimplechecksError,
+  SimpleChecksError,
   APIError,
   APIConnectionError,
   APIConnectionTimeoutError,

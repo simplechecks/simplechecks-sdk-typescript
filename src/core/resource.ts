@@ -1,11 +1,11 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import type { Simplechecks } from '../client';
+import type { SimpleChecks } from '../client';
 
 export abstract class APIResource {
-  protected _client: Simplechecks;
+  protected _client: SimpleChecks;
 
-  constructor(client: Simplechecks) {
+  constructor(client: SimpleChecks) {
     this._client = client;
   }
 }

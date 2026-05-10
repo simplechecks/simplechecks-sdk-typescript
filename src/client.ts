@@ -14,19 +14,40 @@ import * as Opts from './internal/request-options';
 import { stringifyQuery } from './internal/utils/query';
 import { VERSION } from './version';
 import * as Errors from './core/error';
+import * as Pagination from './core/pagination';
+import { AbstractPage, type OffsetParams, OffsetResponse } from './core/pagination';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import { Account, AccountRetrieveResponse } from './resources/account';
+import { Account, AccountResource } from './resources/account';
+import { Balance, BalanceResource } from './resources/balance';
 import {
+  CheckoutSession,
+  CheckoutSessionCreateParams,
+  CheckoutSessions,
+} from './resources/checkout-sessions';
+import { APIKey, KeyCreateParams, KeyCreateResponse, KeyListResponse, Keys } from './resources/keys';
+import {
+  Aggregate,
+  Run,
+  RunAggregatesParams,
+  RunAggregatesResponse,
+  RunListParams,
+  RunListResponse,
+  RunLogsResponse,
+  Runs,
+} from './resources/runs';
+import {
+  AlertChannel,
+  AlertConfig,
   Check,
   CheckCreateParams,
   CheckListParams,
-  CheckListResponse,
   CheckUpdateParams,
   Checks,
-} from './resources/checks';
-import { Healthz, HealthzCheckResponse } from './resources/healthz';
+  ChecksOffset,
+  MaintenanceWindow,
+} from './resources/checks/checks';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -42,35 +63,29 @@ import { isEmptyObj } from './internal/utils/values';
 
 const environments = {
   production: 'https://api.simplechecks.com',
-  environment_1: 'http://localhost:8080',
+  local: 'http://localhost:8080',
 };
 type Environment = keyof typeof environments;
 
 export interface ClientOptions {
   /**
-   * Simple Checks API key, sent as `Authorization: Bearer <key>`.
-   * Manage keys with `sc keys` once the customer CLI ships, or via
-   * the dashboard. Each key carries a fixed scope set; per-route
-   * scope requirements are documented as `x-required-scope` on the
-   * operation (OpenAPI's `oauth2` scope mechanism doesn't apply to
-   * bearer-auth schemes, so we use a vendor extension).
-   *
+   * Defaults to process.env['SIMPLECHECKS_API_KEY'].
    */
-  apiKey?: string | undefined;
+  apiKey?: string | null | undefined;
 
   /**
    * Specifies the environment to use for the API.
    *
    * Each environment maps to a different base URL:
    * - `production` corresponds to `https://api.simplechecks.com`
-   * - `environment_1` corresponds to `http://localhost:8080`
+   * - `local` corresponds to `http://localhost:8080`
    */
   environment?: Environment | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
    *
-   * Defaults to process.env['SIMPLECHECKS_BASE_URL'].
+   * Defaults to process.env['SIMPLE_CHECKS_BASE_URL'].
    */
   baseURL?: string | null | undefined;
 
@@ -124,7 +139,7 @@ export interface ClientOptions {
   /**
    * Set the log level.
    *
-   * Defaults to process.env['SIMPLECHECKS_LOG'] or 'warn' if it isn't set.
+   * Defaults to process.env['SIMPLE_CHECKS_LOG'] or 'warn' if it isn't set.
    */
   logLevel?: LogLevel | undefined;
 
@@ -137,10 +152,10 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the Simplechecks API.
+ * API Client for interfacing with the Simple Checks API.
  */
-export class Simplechecks {
-  apiKey: string;
+export class SimpleChecks {
+  apiKey: string | null;
 
   baseURL: string;
   maxRetries: number;
@@ -155,11 +170,11 @@ export class Simplechecks {
   private _options: ClientOptions;
 
   /**
-   * API Client for interfacing with the Simplechecks API.
+   * API Client for interfacing with the Simple Checks API.
    *
-   * @param {string | undefined} [opts.apiKey=process.env['SIMPLECHECKS_API_KEY'] ?? undefined]
+   * @param {string | null | undefined} [opts.apiKey=process.env['SIMPLECHECKS_API_KEY'] ?? null]
    * @param {Environment} [opts.environment=production] - Specifies the environment URL to use for the API.
-   * @param {string} [opts.baseURL=process.env['SIMPLECHECKS_BASE_URL'] ?? https://api.simplechecks.com] - Override the default base URL for the API.
+   * @param {string} [opts.baseURL=process.env['SIMPLE_CHECKS_BASE_URL'] ?? https://api.simplechecks.com] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
    * @param {Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
@@ -168,16 +183,10 @@ export class Simplechecks {
    * @param {Record<string, string | undefined>} opts.defaultQuery - Default query parameters to include with every request to the API.
    */
   constructor({
-    baseURL = readEnv('SIMPLECHECKS_BASE_URL'),
-    apiKey = readEnv('SIMPLECHECKS_API_KEY'),
+    baseURL = readEnv('SIMPLE_CHECKS_BASE_URL'),
+    apiKey = readEnv('SIMPLECHECKS_API_KEY') ?? null,
     ...opts
   }: ClientOptions = {}) {
-    if (apiKey === undefined) {
-      throw new Errors.SimplechecksError(
-        "The SIMPLECHECKS_API_KEY environment variable is missing or empty; either provide it, or instantiate the Simplechecks client with an apiKey option, like new Simplechecks({ apiKey: 'My API Key' }).",
-      );
-    }
-
     const options: ClientOptions = {
       apiKey,
       ...opts,
@@ -186,27 +195,27 @@ export class Simplechecks {
     };
 
     if (baseURL && opts.environment) {
-      throw new Errors.SimplechecksError(
-        'Ambiguous URL; The `baseURL` option (or SIMPLECHECKS_BASE_URL env var) and the `environment` option are given. If you want to use the environment you must pass baseURL: null',
+      throw new Errors.SimpleChecksError(
+        'Ambiguous URL; The `baseURL` option (or SIMPLE_CHECKS_BASE_URL env var) and the `environment` option are given. If you want to use the environment you must pass baseURL: null',
       );
     }
 
     this.baseURL = options.baseURL || environments[options.environment || 'production'];
-    this.timeout = options.timeout ?? Simplechecks.DEFAULT_TIMEOUT /* 1 minute */;
+    this.timeout = options.timeout ?? SimpleChecks.DEFAULT_TIMEOUT /* 1 minute */;
     this.logger = options.logger ?? console;
     const defaultLogLevel = 'warn';
     // Set default logLevel early so that we can log a warning in parseLogLevel.
     this.logLevel = defaultLogLevel;
     this.logLevel =
       parseLogLevel(options.logLevel, 'ClientOptions.logLevel', this) ??
-      parseLogLevel(readEnv('SIMPLECHECKS_LOG'), "process.env['SIMPLECHECKS_LOG']", this) ??
+      parseLogLevel(readEnv('SIMPLE_CHECKS_LOG'), "process.env['SIMPLE_CHECKS_LOG']", this) ??
       defaultLogLevel;
     this.fetchOptions = options.fetchOptions;
     this.maxRetries = options.maxRetries ?? 2;
     this.fetch = options.fetch ?? Shims.getDefaultFetch();
     this.#encoder = Opts.FallbackEncoder;
 
-    const customHeadersEnv = readEnv('SIMPLECHECKS_CUSTOM_HEADERS');
+    const customHeadersEnv = readEnv('SIMPLE_CHECKS_CUSTOM_HEADERS');
     if (customHeadersEnv) {
       const parsed: Record<string, string> = {};
       for (const line of customHeadersEnv.split('\n')) {
@@ -255,17 +264,22 @@ export class Simplechecks {
   }
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
-    return;
+    if (this.apiKey && values.get('authorization')) {
+      return;
+    }
+    if (nulls.has('authorization')) {
+      return;
+    }
+
+    throw new Error(
+      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
+    );
   }
 
-  protected async authHeaders(
-    opts: FinalRequestOptions,
-    schemes: { bearerAuth?: boolean },
-  ): Promise<NullableHeaders | undefined> {
-    return buildHeaders([schemes.bearerAuth ? await this.bearerAuth(opts) : null]);
-  }
-
-  protected async bearerAuth(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+  protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+    if (this.apiKey == null) {
+      return undefined;
+    }
     return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
@@ -529,6 +543,30 @@ export class Simplechecks {
     return { response, options, controller, requestLogID, retryOfRequestLogID, startTime };
   }
 
+  getAPIList<Item, PageClass extends Pagination.AbstractPage<Item> = Pagination.AbstractPage<Item>>(
+    path: string,
+    Page: new (...args: any[]) => PageClass,
+    opts?: PromiseOrValue<RequestOptions>,
+  ): Pagination.PagePromise<PageClass, Item> {
+    return this.requestAPIList(
+      Page,
+      opts && 'then' in opts ?
+        opts.then((opts) => ({ method: 'get', path, ...opts }))
+      : { method: 'get', path, ...opts },
+    );
+  }
+
+  requestAPIList<
+    Item = unknown,
+    PageClass extends Pagination.AbstractPage<Item> = Pagination.AbstractPage<Item>,
+  >(
+    Page: new (...args: ConstructorParameters<typeof Pagination.AbstractPage>) => PageClass,
+    options: PromiseOrValue<FinalRequestOptions>,
+  ): Pagination.PagePromise<PageClass, Item> {
+    const request = this.makeRequest(options, null, undefined);
+    return new Pagination.PagePromise<PageClass, Item>(this as any as SimpleChecks, request, Page);
+  }
+
   async fetchWithTimeout(
     url: RequestInfo,
     init: RequestInit | undefined,
@@ -695,7 +733,7 @@ export class Simplechecks {
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
       },
-      await this.authHeaders(options, options.__security ?? { bearerAuth: true }),
+      await this.authHeaders(options),
       this._options.defaultHeaders,
       bodyHeaders,
       options.headers,
@@ -757,10 +795,10 @@ export class Simplechecks {
     }
   }
 
-  static Simplechecks = this;
+  static SimpleChecks = this;
   static DEFAULT_TIMEOUT = 60000; // 1 minute
 
-  static SimplechecksError = Errors.SimplechecksError;
+  static SimpleChecksError = Errors.SimpleChecksError;
   static APIError = Errors.APIError;
   static APIConnectionError = Errors.APIConnectionError;
   static APIConnectionTimeoutError = Errors.APIConnectionTimeoutError;
@@ -777,36 +815,82 @@ export class Simplechecks {
   static toFile = Uploads.toFile;
 
   /**
-   * Liveness + readiness.
-   */
-  healthz: API.Healthz = new API.Healthz(this);
-  /**
    * Account profile and balance.
    */
-  account: API.Account = new API.Account(this);
+  account: API.AccountResource = new API.AccountResource(this);
   /**
    * CRUD for synthetic-monitoring checks.
    */
   checks: API.Checks = new API.Checks(this);
+  /**
+   * Read-only access to past check executions.
+   */
+  runs: API.Runs = new API.Runs(this);
+  /**
+   * Manage personal access tokens (PATs).
+   */
+  keys: API.Keys = new API.Keys(this);
+  /**
+   * Run-credit balance + Stripe Checkout for top-ups.
+   */
+  balance: API.BalanceResource = new API.BalanceResource(this);
+  /**
+   * Run-credit balance + Stripe Checkout for top-ups.
+   */
+  checkoutSessions: API.CheckoutSessions = new API.CheckoutSessions(this);
 }
 
-Simplechecks.Healthz = Healthz;
-Simplechecks.Account = Account;
-Simplechecks.Checks = Checks;
+SimpleChecks.AccountResource = AccountResource;
+SimpleChecks.Checks = Checks;
+SimpleChecks.Runs = Runs;
+SimpleChecks.Keys = Keys;
+SimpleChecks.BalanceResource = BalanceResource;
+SimpleChecks.CheckoutSessions = CheckoutSessions;
 
-export declare namespace Simplechecks {
+export declare namespace SimpleChecks {
   export type RequestOptions = Opts.RequestOptions;
 
-  export { Healthz as Healthz, type HealthzCheckResponse as HealthzCheckResponse };
+  export import Offset = Pagination.Offset;
+  export { type OffsetParams as OffsetParams, type OffsetResponse as OffsetResponse };
 
-  export { Account as Account, type AccountRetrieveResponse as AccountRetrieveResponse };
+  export { AccountResource as AccountResource, type Account as Account };
 
   export {
     Checks as Checks,
+    type AlertChannel as AlertChannel,
+    type AlertConfig as AlertConfig,
     type Check as Check,
-    type CheckListResponse as CheckListResponse,
+    type MaintenanceWindow as MaintenanceWindow,
+    type ChecksOffset as ChecksOffset,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,
     type CheckListParams as CheckListParams,
+  };
+
+  export {
+    Runs as Runs,
+    type Aggregate as Aggregate,
+    type Run as Run,
+    type RunListResponse as RunListResponse,
+    type RunAggregatesResponse as RunAggregatesResponse,
+    type RunLogsResponse as RunLogsResponse,
+    type RunListParams as RunListParams,
+    type RunAggregatesParams as RunAggregatesParams,
+  };
+
+  export {
+    Keys as Keys,
+    type APIKey as APIKey,
+    type KeyCreateResponse as KeyCreateResponse,
+    type KeyListResponse as KeyListResponse,
+    type KeyCreateParams as KeyCreateParams,
+  };
+
+  export { BalanceResource as BalanceResource, type Balance as Balance };
+
+  export {
+    CheckoutSessions as CheckoutSessions,
+    type CheckoutSession as CheckoutSession,
+    type CheckoutSessionCreateParams as CheckoutSessionCreateParams,
   };
 }

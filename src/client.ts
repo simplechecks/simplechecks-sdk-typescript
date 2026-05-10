@@ -26,6 +26,7 @@ import {
   CheckoutSessionCreateParams,
   CheckoutSessions,
 } from './resources/checkout-sessions';
+import { Incident, IncidentListParams, IncidentListResponse, Incidents } from './resources/incidents';
 import { APIKey, KeyCreateParams, KeyCreateResponse, KeyListResponse, Keys } from './resources/keys';
 import {
   Aggregate,
@@ -827,6 +828,10 @@ export class SimpleChecks {
    */
   runs: API.Runs = new API.Runs(this);
   /**
+   * Read-only incident timeline derived from alert state.
+   */
+  incidents: API.Incidents = new API.Incidents(this);
+  /**
    * Manage personal access tokens (PATs).
    */
   keys: API.Keys = new API.Keys(this);
@@ -843,6 +848,7 @@ export class SimpleChecks {
 SimpleChecks.AccountResource = AccountResource;
 SimpleChecks.Checks = Checks;
 SimpleChecks.Runs = Runs;
+SimpleChecks.Incidents = Incidents;
 SimpleChecks.Keys = Keys;
 SimpleChecks.BalanceResource = BalanceResource;
 SimpleChecks.CheckoutSessions = CheckoutSessions;
@@ -876,6 +882,13 @@ export declare namespace SimpleChecks {
     type RunLogsResponse as RunLogsResponse,
     type RunListParams as RunListParams,
     type RunAggregatesParams as RunAggregatesParams,
+  };
+
+  export {
+    Incidents as Incidents,
+    type Incident as Incident,
+    type IncidentListResponse as IncidentListResponse,
+    type IncidentListParams as IncidentListParams,
   };
 
   export {

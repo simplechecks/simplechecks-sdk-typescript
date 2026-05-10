@@ -4,7 +4,6 @@ import { APIResource } from '../../core/resource';
 import * as AlertsAPI from './alerts';
 import { AlertReplaceParams, AlertTestFireResponse, Alerts } from './alerts';
 import { APIPromise } from '../../core/api-promise';
-import { Offset, type OffsetParams, PagePromise } from '../../core/pagination';
 import { buildHeaders } from '../../internal/headers';
 import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
@@ -69,17 +68,14 @@ export class Checks extends APIResource {
    *
    * @example
    * ```ts
-   * // Automatically fetches more pages as needed.
-   * for await (const checkListResponse of client.checks.list()) {
-   *   // ...
-   * }
+   * const checks = await client.checks.list();
    * ```
    */
   list(
     query: CheckListParams | null | undefined = {},
     options?: RequestOptions,
-  ): PagePromise<CheckListResponsesOffset, CheckListResponse> {
-    return this._client.getAPIList('/v1/checks', Offset<CheckListResponse>, { query, ...options });
+  ): APIPromise<CheckListResponse> {
+    return this._client.get('/v1/checks', { query, ...options });
   }
 
   /**
@@ -97,8 +93,6 @@ export class Checks extends APIResource {
     });
   }
 }
-
-export type CheckListResponsesOffset = Offset<CheckListResponse>;
 
 export interface AlertChannel {
   /**
@@ -284,7 +278,17 @@ export interface CheckUpdateParams {
   type?: string;
 }
 
-export interface CheckListParams extends OffsetParams {}
+export interface CheckListParams {
+  /**
+   * Max number of checks to return. Defaults to 100; the server caps further.
+   */
+  limit?: number;
+
+  /**
+   * Number of checks to skip. Pass the `next_offset` from the previous page.
+   */
+  offset?: number;
+}
 
 Checks.Alerts = Alerts;
 
@@ -295,7 +299,6 @@ export declare namespace Checks {
     type Check as Check,
     type MaintenanceWindow as MaintenanceWindow,
     type CheckListResponse as CheckListResponse,
-    type CheckListResponsesOffset as CheckListResponsesOffset,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,
     type CheckListParams as CheckListParams,

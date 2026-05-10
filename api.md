@@ -23,7 +23,7 @@ Methods:
 - <code title="post /v1/checks">client.checks.<a href="./src/resources/checks/checks.ts">create</a>({ ...params }) -> Check</code>
 - <code title="get /v1/checks/{id}">client.checks.<a href="./src/resources/checks/checks.ts">retrieve</a>(id) -> Check</code>
 - <code title="patch /v1/checks/{id}">client.checks.<a href="./src/resources/checks/checks.ts">update</a>(id, { ...params }) -> Check</code>
-- <code title="get /v1/checks">client.checks.<a href="./src/resources/checks/checks.ts">list</a>({ ...params }) -> CheckListResponse</code>
+- <code title="get /v1/checks">client.checks.<a href="./src/resources/checks/checks.ts">list</a>({ ...params }) -> CheckListResponsesOffset</code>
 - <code title="delete /v1/checks/{id}">client.checks.<a href="./src/resources/checks/checks.ts">delete</a>(id) -> void</code>
 
 ## Alerts

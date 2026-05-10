@@ -27,9 +27,10 @@ const client = new SimpleChecks({
   environment: 'local', // defaults to 'production'
 });
 
-const checks = await client.checks.list();
+const page = await client.checks.list();
+const checkListResponse = page.data[0];
 
-console.log(checks.checks);
+console.log(checkListResponse.checks);
 ```
 
 ### Request & Response types
@@ -123,6 +124,37 @@ await client.account.retrieve({
 On timeout, an `APIConnectionTimeoutError` is thrown.
 
 Note that requests which time out will be [retried twice by default](#retries).
+
+## Auto-pagination
+
+List methods in the SimpleChecks API are paginated.
+You can use the `for await … of` syntax to iterate through items across all pages:
+
+```ts
+async function fetchAllCheckListResponses(params) {
+  const allCheckListResponses = [];
+  // Automatically fetches more pages as needed.
+  for await (const checkListResponse of client.checks.list()) {
+    allCheckListResponses.push(checkListResponse);
+  }
+  return allCheckListResponses;
+}
+```
+
+Alternatively, you can request a single page at a time:
+
+```ts
+let page = await client.checks.list();
+for (const checkListResponse of page.data) {
+  console.log(checkListResponse);
+}
+
+// Convenience methods are provided for manually paginating:
+while (page.hasNextPage()) {
+  page = await page.getNextPage();
+  // ...
+}
+```
 
 ## Advanced Usage
 

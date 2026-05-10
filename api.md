@@ -55,6 +55,17 @@ Methods:
 - <code title="get /v1/runs/aggregates">client.runs.<a href="./src/resources/runs.ts">aggregates</a>({ ...params }) -> RunAggregatesResponse</code>
 - <code title="get /v1/runs/{id}/logs">client.runs.<a href="./src/resources/runs.ts">logs</a>(id) -> string</code>
 
+# Incidents
+
+Types:
+
+- <code><a href="./src/resources/incidents.ts">Incident</a></code>
+- <code><a href="./src/resources/incidents.ts">IncidentListResponse</a></code>
+
+Methods:
+
+- <code title="get /v1/incidents">client.incidents.<a href="./src/resources/incidents.ts">list</a>({ ...params }) -> IncidentListResponse</code>
+
 # Keys
 
 Types:

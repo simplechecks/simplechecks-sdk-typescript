@@ -36,6 +36,7 @@ import {
   Runs,
 } from './resources/runs';
 import {
+  AlertChannel,
   AlertConfig,
   Check,
   CheckCreateParams,
@@ -43,6 +44,7 @@ import {
   CheckListResponse,
   CheckUpdateParams,
   Checks,
+  MaintenanceWindow,
 } from './resources/checks/checks';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
@@ -826,8 +828,10 @@ export declare namespace SimpleChecks {
 
   export {
     Checks as Checks,
+    type AlertChannel as AlertChannel,
     type AlertConfig as AlertConfig,
     type Check as Check,
+    type MaintenanceWindow as MaintenanceWindow,
     type CheckListResponse as CheckListResponse,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,

@@ -12,8 +12,10 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/checks/checks.ts">AlertChannel</a></code>
 - <code><a href="./src/resources/checks/checks.ts">AlertConfig</a></code>
 - <code><a href="./src/resources/checks/checks.ts">Check</a></code>
+- <code><a href="./src/resources/checks/checks.ts">MaintenanceWindow</a></code>
 - <code><a href="./src/resources/checks/checks.ts">CheckListResponse</a></code>
 
 Methods:

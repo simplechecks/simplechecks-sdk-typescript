@@ -9,8 +9,10 @@ export {
 } from './checkout-sessions';
 export {
   Checks,
+  type AlertChannel,
   type AlertConfig,
   type Check,
+  type MaintenanceWindow,
   type CheckListResponse,
   type CheckCreateParams,
   type CheckUpdateParams,

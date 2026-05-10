@@ -94,8 +94,24 @@ export class Checks extends APIResource {
   }
 }
 
+export interface AlertChannel {
+  /**
+   * Channel-specific destination. URL for the webhook flavors
+   * (slack/discord/teams/webhook), email address for `email`, integration key for
+   * `pagerduty`, API key for `opsgenie`.
+   */
+  target: string;
+
+  type: 'email' | 'slack' | 'discord' | 'teams' | 'webhook' | 'pagerduty' | 'opsgenie';
+
+  /**
+   * Type-specific options. Optional.
+   */
+  config?: { [key: string]: unknown };
+}
+
 export interface AlertConfig {
-  channels: Array<AlertConfig.Channel>;
+  channels: Array<AlertChannel>;
 
   /**
    * Number of consecutive globally-failing observations (after M-of-N consensus
@@ -139,33 +155,9 @@ export interface AlertConfig {
    * Absolute-time windows during which the evaluator suppresses dispatch but still
    * updates state. Cron-style recurring windows are a future enhancement.
    */
-  maintenance_windows?: Array<AlertConfig.MaintenanceWindow>;
+  maintenance_windows?: Array<MaintenanceWindow>;
 
   updated_at?: string;
-}
-
-export namespace AlertConfig {
-  export interface Channel {
-    /**
-     * Channel-specific destination. URL for the webhook flavors
-     * (slack/discord/teams/webhook), email address for `email`, integration key for
-     * `pagerduty`, API key for `opsgenie`.
-     */
-    target: string;
-
-    type: 'email' | 'slack' | 'discord' | 'teams' | 'webhook' | 'pagerduty' | 'opsgenie';
-
-    /**
-     * Type-specific options. Optional.
-     */
-    config?: { [key: string]: unknown };
-  }
-
-  export interface MaintenanceWindow {
-    end_unix_ms: number;
-
-    start_unix_ms: number;
-  }
 }
 
 export interface Check {
@@ -222,6 +214,12 @@ export interface Check {
    * Cloud provider on read responses is empty; populated on create requests only.
    */
   provider?: string;
+}
+
+export interface MaintenanceWindow {
+  end_unix_ms: number;
+
+  start_unix_ms: number;
 }
 
 export interface CheckListResponse {
@@ -296,8 +294,10 @@ Checks.Alerts = Alerts;
 
 export declare namespace Checks {
   export {
+    type AlertChannel as AlertChannel,
     type AlertConfig as AlertConfig,
     type Check as Check,
+    type MaintenanceWindow as MaintenanceWindow,
     type CheckListResponse as CheckListResponse,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,

@@ -113,7 +113,7 @@ export interface AlertTestFireResponse {
 }
 
 export interface AlertReplaceParams {
-  channels: Array<AlertReplaceParams.Channel>;
+  channels: Array<ChecksAPI.AlertChannel>;
 
   /**
    * Number of consecutive globally-failing observations (after M-of-N consensus
@@ -155,31 +155,7 @@ export interface AlertReplaceParams {
    * Absolute-time windows during which the evaluator suppresses dispatch but still
    * updates state. Cron-style recurring windows are a future enhancement.
    */
-  maintenance_windows?: Array<AlertReplaceParams.MaintenanceWindow>;
-}
-
-export namespace AlertReplaceParams {
-  export interface Channel {
-    /**
-     * Channel-specific destination. URL for the webhook flavors
-     * (slack/discord/teams/webhook), email address for `email`, integration key for
-     * `pagerduty`, API key for `opsgenie`.
-     */
-    target: string;
-
-    type: 'email' | 'slack' | 'discord' | 'teams' | 'webhook' | 'pagerduty' | 'opsgenie';
-
-    /**
-     * Type-specific options. Optional.
-     */
-    config?: { [key: string]: unknown };
-  }
-
-  export interface MaintenanceWindow {
-    end_unix_ms: number;
-
-    start_unix_ms: number;
-  }
+  maintenance_windows?: Array<ChecksAPI.MaintenanceWindow>;
 }
 
 export declare namespace Alerts {

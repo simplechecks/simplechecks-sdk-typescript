@@ -17,6 +17,7 @@ export {
   type CheckCreateParams,
   type CheckUpdateParams,
   type CheckListParams,
+  type CheckListResponsesOffset,
 } from './checks/checks';
 export {
   Keys,

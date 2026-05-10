@@ -14,6 +14,8 @@ import * as Opts from './internal/request-options';
 import { stringifyQuery } from './internal/utils/query';
 import { VERSION } from './version';
 import * as Errors from './core/error';
+import * as Pagination from './core/pagination';
+import { AbstractPage, type OffsetParams, OffsetResponse } from './core/pagination';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
@@ -42,6 +44,7 @@ import {
   CheckCreateParams,
   CheckListParams,
   CheckListResponse,
+  CheckListResponsesOffset,
   CheckUpdateParams,
   Checks,
   MaintenanceWindow,
@@ -541,6 +544,30 @@ export class SimpleChecks {
     return { response, options, controller, requestLogID, retryOfRequestLogID, startTime };
   }
 
+  getAPIList<Item, PageClass extends Pagination.AbstractPage<Item> = Pagination.AbstractPage<Item>>(
+    path: string,
+    Page: new (...args: any[]) => PageClass,
+    opts?: PromiseOrValue<RequestOptions>,
+  ): Pagination.PagePromise<PageClass, Item> {
+    return this.requestAPIList(
+      Page,
+      opts && 'then' in opts ?
+        opts.then((opts) => ({ method: 'get', path, ...opts }))
+      : { method: 'get', path, ...opts },
+    );
+  }
+
+  requestAPIList<
+    Item = unknown,
+    PageClass extends Pagination.AbstractPage<Item> = Pagination.AbstractPage<Item>,
+  >(
+    Page: new (...args: ConstructorParameters<typeof Pagination.AbstractPage>) => PageClass,
+    options: PromiseOrValue<FinalRequestOptions>,
+  ): Pagination.PagePromise<PageClass, Item> {
+    const request = this.makeRequest(options, null, undefined);
+    return new Pagination.PagePromise<PageClass, Item>(this as any as SimpleChecks, request, Page);
+  }
+
   async fetchWithTimeout(
     url: RequestInfo,
     init: RequestInit | undefined,
@@ -824,6 +851,9 @@ SimpleChecks.CheckoutSessions = CheckoutSessions;
 export declare namespace SimpleChecks {
   export type RequestOptions = Opts.RequestOptions;
 
+  export import Offset = Pagination.Offset;
+  export { type OffsetParams as OffsetParams, type OffsetResponse as OffsetResponse };
+
   export { AccountResource as AccountResource, type Account as Account };
 
   export {
@@ -833,6 +863,7 @@ export declare namespace SimpleChecks {
     type Check as Check,
     type MaintenanceWindow as MaintenanceWindow,
     type CheckListResponse as CheckListResponse,
+    type CheckListResponsesOffset as CheckListResponsesOffset,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,
     type CheckListParams as CheckListParams,

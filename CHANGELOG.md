@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2026-05-10)
+
+Full Changelog: [v0.1.0...v0.2.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.1.0...v0.2.0)
+
+### Features
+
+* **api:** api update ([0cf97b5](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/0cf97b5ed867d741e57efb0ccbed6caed19aaa6f))
+
 ## 0.1.0 (2026-05-10)
 
 Full Changelog: [v0.0.4...v0.1.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.0.4...v0.1.0)

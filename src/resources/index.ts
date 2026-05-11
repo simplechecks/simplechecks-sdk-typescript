@@ -26,6 +26,7 @@ export {
   type KeyListResponse,
   type KeyCreateParams,
 } from './keys';
+export { Locations, type Location, type LocationListResponse } from './locations';
 export {
   Members,
   type Invitation,

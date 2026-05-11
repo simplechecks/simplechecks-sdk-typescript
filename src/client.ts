@@ -28,6 +28,7 @@ import {
 } from './resources/checkout-sessions';
 import { Incident, IncidentListParams, IncidentListResponse, Incidents } from './resources/incidents';
 import { APIKey, KeyCreateParams, KeyCreateResponse, KeyListResponse, Keys } from './resources/keys';
+import { Location, LocationListResponse, Locations } from './resources/locations';
 import {
   Aggregate,
   Run,
@@ -858,6 +859,13 @@ export class SimpleChecks {
    *
    */
   members: API.Members = new API.Members(this);
+  /**
+   * Catalog of (provider, location) deployments Simple Checks runs
+   * checks from, with geographic metadata + live status. Used to
+   * drive the region picker and the dashboard's locations map.
+   *
+   */
+  locations: API.Locations = new API.Locations(this);
 }
 
 SimpleChecks.AccountResource = AccountResource;
@@ -868,6 +876,7 @@ SimpleChecks.Keys = Keys;
 SimpleChecks.BalanceResource = BalanceResource;
 SimpleChecks.CheckoutSessions = CheckoutSessions;
 SimpleChecks.Members = Members;
+SimpleChecks.Locations = Locations;
 
 export declare namespace SimpleChecks {
   export type RequestOptions = Opts.RequestOptions;
@@ -929,5 +938,11 @@ export declare namespace SimpleChecks {
     type Member as Member,
     type MemberListResponse as MemberListResponse,
     type MemberUpdateParams as MemberUpdateParams,
+  };
+
+  export {
+    Locations as Locations,
+    type Location as Location,
+    type LocationListResponse as LocationListResponse,
   };
 }

@@ -27,6 +27,13 @@ export {
   type KeyCreateParams,
 } from './keys';
 export {
+  Members,
+  type Invitation,
+  type Member,
+  type MemberListResponse,
+  type MemberUpdateParams,
+} from './members/members';
+export {
   Runs,
   type Aggregate,
   type Run,

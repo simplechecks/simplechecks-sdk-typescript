@@ -49,6 +49,13 @@ import {
   ChecksOffset,
   MaintenanceWindow,
 } from './resources/checks/checks';
+import {
+  Invitation,
+  Member,
+  MemberListResponse,
+  MemberUpdateParams,
+  Members,
+} from './resources/members/members';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -843,6 +850,14 @@ export class SimpleChecks {
    * Run-credit balance + Stripe Checkout for top-ups.
    */
   checkoutSessions: API.CheckoutSessions = new API.CheckoutSessions(this);
+  /**
+   * Manage who has access to an account and at what role
+   * (PR-Members/2). Five roles: owner / admin / member / billing /
+   * viewer. Owner is the strict superset of all other roles' scopes;
+   * every account always has at least one owner.
+   *
+   */
+  members: API.Members = new API.Members(this);
 }
 
 SimpleChecks.AccountResource = AccountResource;
@@ -852,6 +867,7 @@ SimpleChecks.Incidents = Incidents;
 SimpleChecks.Keys = Keys;
 SimpleChecks.BalanceResource = BalanceResource;
 SimpleChecks.CheckoutSessions = CheckoutSessions;
+SimpleChecks.Members = Members;
 
 export declare namespace SimpleChecks {
   export type RequestOptions = Opts.RequestOptions;
@@ -905,5 +921,13 @@ export declare namespace SimpleChecks {
     CheckoutSessions as CheckoutSessions,
     type CheckoutSession as CheckoutSession,
     type CheckoutSessionCreateParams as CheckoutSessionCreateParams,
+  };
+
+  export {
+    Members as Members,
+    type Invitation as Invitation,
+    type Member as Member,
+    type MemberListResponse as MemberListResponse,
+    type MemberUpdateParams as MemberUpdateParams,
   };
 }

@@ -125,3 +125,14 @@ Methods:
 - <code title="post /v1/invitations">client.members.invitations.<a href="./src/resources/members/invitations.ts">create</a>({ ...params }) -> Invitation</code>
 - <code title="get /v1/invitations">client.members.invitations.<a href="./src/resources/members/invitations.ts">list</a>() -> InvitationListResponse</code>
 - <code title="delete /v1/invitations/{id}">client.members.invitations.<a href="./src/resources/members/invitations.ts">revoke</a>(id) -> void</code>
+
+# Locations
+
+Types:
+
+- <code><a href="./src/resources/locations.ts">Location</a></code>
+- <code><a href="./src/resources/locations.ts">LocationListResponse</a></code>
+
+Methods:
+
+- <code title="get /v1/locations">client.locations.<a href="./src/resources/locations.ts">list</a>() -> LocationListResponse</code>

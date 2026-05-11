@@ -99,3 +99,29 @@ Types:
 Methods:
 
 - <code title="post /v1/checkout-session">client.checkoutSessions.<a href="./src/resources/checkout-sessions.ts">create</a>({ ...params }) -> CheckoutSession</code>
+
+# Members
+
+Types:
+
+- <code><a href="./src/resources/members/members.ts">Invitation</a></code>
+- <code><a href="./src/resources/members/members.ts">Member</a></code>
+- <code><a href="./src/resources/members/members.ts">MemberListResponse</a></code>
+
+Methods:
+
+- <code title="patch /v1/members/{user_id}">client.members.<a href="./src/resources/members/members.ts">update</a>(userID, { ...params }) -> Member</code>
+- <code title="get /v1/members">client.members.<a href="./src/resources/members/members.ts">list</a>() -> MemberListResponse</code>
+- <code title="delete /v1/members/{user_id}">client.members.<a href="./src/resources/members/members.ts">remove</a>(userID) -> void</code>
+
+## Invitations
+
+Types:
+
+- <code><a href="./src/resources/members/invitations.ts">InvitationListResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/invitations">client.members.invitations.<a href="./src/resources/members/invitations.ts">create</a>({ ...params }) -> Invitation</code>
+- <code title="get /v1/invitations">client.members.invitations.<a href="./src/resources/members/invitations.ts">list</a>() -> InvitationListResponse</code>
+- <code title="delete /v1/invitations/{id}">client.members.invitations.<a href="./src/resources/members/invitations.ts">revoke</a>(id) -> void</code>

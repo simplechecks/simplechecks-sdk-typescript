@@ -23,9 +23,7 @@ export class Checks extends APIResource {
    * ```ts
    * const check = await client.checks.create({
    *   enabled: true,
-   *   location: 'location',
    *   name: 'name',
-   *   provider: 'provider',
    *   schedule: '* /5 * * * *',
    *   target_url: 'https://example.com',
    *   type: 'http',
@@ -212,12 +210,22 @@ export interface Check {
   config?: { [key: string]: unknown };
 
   /**
-   * Region/location on read responses is empty; populated on create requests only.
+   * Legacy: the first location's provider-native id. Same back-compat caveats as
+   * `provider`. Consult `locations`.
    */
   location?: string;
 
   /**
-   * Cloud provider on read responses is empty; populated on create requests only.
+   * All locations the check runs from, in wire form (`provider:location`, e.g.
+   * `aws:us-east-1`). Element 0 is the deterministic "primary" — order matches
+   * creation.
+   */
+  locations?: Array<string>;
+
+  /**
+   * Legacy: the first location's provider, mirrors `locations[0]` split. Empty on
+   * read for multi-location checks (consult `locations` instead). Kept for one
+   * release cycle of SDK back-compat.
    */
   provider?: string;
 }
@@ -231,17 +239,7 @@ export interface MaintenanceWindow {
 export interface CheckCreateParams {
   enabled: boolean;
 
-  /**
-   * Provider-specific region/location.
-   */
-  location: string;
-
   name: string;
-
-  /**
-   * Cloud provider (`mock`, `ec2`, `ovh`, `azure`, `gcp`, `hetzner`).
-   */
-  provider: string;
 
   schedule: string;
 
@@ -253,6 +251,24 @@ export interface CheckCreateParams {
 
   config?: { [key: string]: unknown };
 
+  /**
+   * Legacy; see `provider`.
+   */
+  location?: string;
+
+  /**
+   * Preferred: array of wire-form ids (`aws:us-east-1`). Element 0 is the
+   * deterministic primary. Each entry must be in the deployment catalog returned by
+   * `GET /v1/locations`.
+   */
+  locations?: Array<string>;
+
+  /**
+   * Legacy single-location shape. Translated server-side to
+   * `locations=[<provider>:<location>]`. Kept for one release cycle.
+   */
+  provider?: string;
+
   timeout_ms?: number;
 }
 
@@ -262,6 +278,12 @@ export interface CheckUpdateParams {
   config?: { [key: string]: unknown };
 
   enabled?: boolean;
+
+  /**
+   * Replace the location set. nil-array = leave unchanged. Each entry must be in the
+   * deployment catalog (`GET /v1/locations`).
+   */
+  locations?: Array<string>;
 
   name?: string;
 

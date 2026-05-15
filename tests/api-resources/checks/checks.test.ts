@@ -11,9 +11,7 @@ describe('resource checks', () => {
   test('create: only required params', async () => {
     const responsePromise = client.checks.create({
       enabled: true,
-      location: 'location',
       name: 'name',
-      provider: 'provider',
       schedule: '*/5 * * * *',
       target_url: 'https://example.com',
       type: 'http',
@@ -30,14 +28,15 @@ describe('resource checks', () => {
   test('create: required and optional params', async () => {
     const response = await client.checks.create({
       enabled: true,
-      location: 'location',
       name: 'name',
-      provider: 'provider',
       schedule: '*/5 * * * *',
       target_url: 'https://example.com',
       type: 'http',
       artifact_url: 'artifact_url',
       config: { foo: 'bar' },
+      location: 'location',
+      locations: ['aws:us-east-1', 'hetzner:fsn1'],
+      provider: 'provider',
       timeout_ms: 0,
     });
   });

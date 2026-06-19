@@ -4,6 +4,10 @@ import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
+/**
+ * Active token-pricing table: per-check-type weights and the
+ * customer-facing provider cost multipliers. Reads are free.
+ */
 export class PricingResource extends APIResource {
   /**
    * Returns the active token-pricing table so a client can show the per-provider

@@ -880,6 +880,11 @@ export class SimpleChecks {
    *
    */
   locations: API.Locations = new API.Locations(this);
+  /**
+   * Active token-pricing table: per-check-type weights and the
+   * customer-facing provider cost multipliers. Reads are free.
+   *
+   */
   pricing: API.PricingResource = new API.PricingResource(this);
 }
 

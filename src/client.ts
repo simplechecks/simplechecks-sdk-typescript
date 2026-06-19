@@ -29,6 +29,8 @@ import {
 import { Incident, IncidentListParams, IncidentListResponse, Incidents } from './resources/incidents';
 import { APIKey, KeyCreateParams, KeyCreateResponse, KeyListResponse, Keys } from './resources/keys';
 import { Location, LocationListResponse, Locations } from './resources/locations';
+import { Pricing, PricingResource } from './resources/pricing';
+import { Purchase, PurchaseListParams, PurchaseListResponse, Purchases } from './resources/purchases';
 import {
   Aggregate,
   Run,
@@ -852,13 +854,17 @@ export class SimpleChecks {
    */
   keys: API.Keys = new API.Keys(this);
   /**
-   * Run-credit balance + Stripe Checkout for top-ups.
+   * Run-credit balance, Stripe Checkout top-ups, and purchase history.
    */
   balance: API.BalanceResource = new API.BalanceResource(this);
   /**
-   * Run-credit balance + Stripe Checkout for top-ups.
+   * Run-credit balance, Stripe Checkout top-ups, and purchase history.
    */
   checkoutSessions: API.CheckoutSessions = new API.CheckoutSessions(this);
+  /**
+   * Run-credit balance, Stripe Checkout top-ups, and purchase history.
+   */
+  purchases: API.Purchases = new API.Purchases(this);
   /**
    * Manage who has access to an account and at what role
    * (PR-Members/2). Five roles: owner / admin / member / billing /
@@ -874,6 +880,7 @@ export class SimpleChecks {
    *
    */
   locations: API.Locations = new API.Locations(this);
+  pricing: API.PricingResource = new API.PricingResource(this);
 }
 
 SimpleChecks.AccountResource = AccountResource;
@@ -883,8 +890,10 @@ SimpleChecks.Incidents = Incidents;
 SimpleChecks.Keys = Keys;
 SimpleChecks.BalanceResource = BalanceResource;
 SimpleChecks.CheckoutSessions = CheckoutSessions;
+SimpleChecks.Purchases = Purchases;
 SimpleChecks.Members = Members;
 SimpleChecks.Locations = Locations;
+SimpleChecks.PricingResource = PricingResource;
 
 export declare namespace SimpleChecks {
   export type RequestOptions = Opts.RequestOptions;
@@ -941,6 +950,13 @@ export declare namespace SimpleChecks {
   };
 
   export {
+    Purchases as Purchases,
+    type Purchase as Purchase,
+    type PurchaseListResponse as PurchaseListResponse,
+    type PurchaseListParams as PurchaseListParams,
+  };
+
+  export {
     Members as Members,
     type Invitation as Invitation,
     type Member as Member,
@@ -953,4 +969,6 @@ export declare namespace SimpleChecks {
     type Location as Location,
     type LocationListResponse as LocationListResponse,
   };
+
+  export { PricingResource as PricingResource, type Pricing as Pricing };
 }

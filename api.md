@@ -100,6 +100,17 @@ Methods:
 
 - <code title="post /v1/checkout-session">client.checkoutSessions.<a href="./src/resources/checkout-sessions.ts">create</a>({ ...params }) -> CheckoutSession</code>
 
+# Purchases
+
+Types:
+
+- <code><a href="./src/resources/purchases.ts">Purchase</a></code>
+- <code><a href="./src/resources/purchases.ts">PurchaseListResponse</a></code>
+
+Methods:
+
+- <code title="get /v1/purchases">client.purchases.<a href="./src/resources/purchases.ts">list</a>({ ...params }) -> PurchaseListResponse</code>
+
 # Members
 
 Types:
@@ -136,3 +147,13 @@ Types:
 Methods:
 
 - <code title="get /v1/locations">client.locations.<a href="./src/resources/locations.ts">list</a>() -> LocationListResponse</code>
+
+# Pricing
+
+Types:
+
+- <code><a href="./src/resources/pricing.ts">Pricing</a></code>
+
+Methods:
+
+- <code title="get /v1/pricing">client.pricing.<a href="./src/resources/pricing.ts">retrieve</a>() -> Pricing</code>

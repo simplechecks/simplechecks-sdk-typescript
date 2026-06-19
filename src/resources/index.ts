@@ -34,6 +34,8 @@ export {
   type MemberListResponse,
   type MemberUpdateParams,
 } from './members/members';
+export { PricingResource, type Pricing } from './pricing';
+export { Purchases, type Purchase, type PurchaseListResponse, type PurchaseListParams } from './purchases';
 export {
   Runs,
   type Aggregate,

@@ -36,10 +36,12 @@ describe('resource runs', () => {
       client.runs.list(
         {
           check_id: 'check_id',
+          cursor: 'cursor',
           limit: 0,
-          offset: 0,
+          location: 'location',
           since: 0,
           status: 'PASS',
+          until: 0,
         },
         { path: '/_stainless_unknown_path' },
       ),

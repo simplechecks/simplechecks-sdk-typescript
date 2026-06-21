@@ -15,7 +15,13 @@ import { stringifyQuery } from './internal/utils/query';
 import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Pagination from './core/pagination';
-import { AbstractPage, type OffsetParams, OffsetResponse } from './core/pagination';
+import {
+  AbstractPage,
+  type OffsetParams,
+  OffsetResponse,
+  type RunsCursorParams,
+  RunsCursorResponse,
+} from './core/pagination';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
@@ -33,11 +39,12 @@ import { Pricing, PricingResource } from './resources/pricing';
 import { Purchase, PurchaseListParams, PurchaseListResponse, Purchases } from './resources/purchases';
 import {
   Aggregate,
-  Run,
   RunAggregatesParams,
   RunAggregatesResponse,
+  RunDetail,
+  RunListItem,
+  RunListItemsRunsCursor,
   RunListParams,
-  RunListResponse,
   RunLogsResponse,
   Runs,
 } from './resources/runs';
@@ -906,6 +913,9 @@ export declare namespace SimpleChecks {
   export import Offset = Pagination.Offset;
   export { type OffsetParams as OffsetParams, type OffsetResponse as OffsetResponse };
 
+  export import RunsCursor = Pagination.RunsCursor;
+  export { type RunsCursorParams as RunsCursorParams, type RunsCursorResponse as RunsCursorResponse };
+
   export { AccountResource as AccountResource, type Account as Account };
 
   export {
@@ -923,10 +933,11 @@ export declare namespace SimpleChecks {
   export {
     Runs as Runs,
     type Aggregate as Aggregate,
-    type Run as Run,
-    type RunListResponse as RunListResponse,
+    type RunDetail as RunDetail,
+    type RunListItem as RunListItem,
     type RunAggregatesResponse as RunAggregatesResponse,
     type RunLogsResponse as RunLogsResponse,
+    type RunListItemsRunsCursor as RunListItemsRunsCursor,
     type RunListParams as RunListParams,
     type RunAggregatesParams as RunAggregatesParams,
   };

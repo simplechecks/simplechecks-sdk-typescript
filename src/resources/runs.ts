@@ -2,6 +2,7 @@
 
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
+import { PagePromise, RunsCursor, type RunsCursorParams } from '../core/pagination';
 import { type Uploadable } from '../core/uploads';
 import { buildHeaders } from '../internal/headers';
 import { RequestOptions } from '../internal/request-options';
@@ -13,23 +14,31 @@ import { path } from '../internal/utils/path';
  */
 export class Runs extends APIResource {
   /**
-   * Returns the run matching `id`. The id's embedded UUIDv7 timestamp scopes the
-   * server-side scan to one day. Requires the `runs:read` scope.
+   * Returns the full record for the run matching `id` — the slim list fields plus
+   * the run's `metadata` (a JSON object) and a list of downloadable `artifacts`
+   * (each an opaque URL). Runs are retained for 30 days; an aged-out or unknown id
+   * returns 404. Requires the `runs:read` scope.
    */
-  retrieve(id: string, options?: RequestOptions): APIPromise<Run> {
+  retrieve(id: string, options?: RequestOptions): APIPromise<RunDetail> {
     return this._client.get(path`/v1/runs/${id}`, options);
   }
 
   /**
    * Returns runs ordered by start time descending. Filter with `check_id`, `status`,
-   * `since` (unix-millis lower bound). `limit` defaults to 50 (max 200); `offset`
-   * paginates within the filtered set. Requires the `runs:read` scope.
+   * `location`, and a `since`/`until` unix-millis window. `limit` defaults to 50
+   * (max 200). Pages are cursor-based: when more rows remain, the response carries a
+   * `next_cursor` — pass it back as `cursor` to fetch the next page. Requires the
+   * `runs:read` scope.
    *
-   * Run records come from the parquet result files garrisons write to S3; this
-   * endpoint scans up to the last 7 days by default. Older runs are not retained.
+   * Run records are served from the central runs table; runs are retained for 30
+   * days. Each record carries structured `provider`/`region`/`location` fields and a
+   * short `error_summary` rather than infrastructure internals.
    */
-  list(query: RunListParams | null | undefined = {}, options?: RequestOptions): APIPromise<RunListResponse> {
-    return this._client.get('/v1/runs', { query, ...options });
+  list(
+    query: RunListParams | null | undefined = {},
+    options?: RequestOptions,
+  ): PagePromise<RunListItemsRunsCursor, RunListItem> {
+    return this._client.getAPIList('/v1/runs', RunsCursor<RunListItem>, { query, ...options });
   }
 
   /**
@@ -93,6 +102,8 @@ export class Runs extends APIResource {
   }
 }
 
+export type RunListItemsRunsCursor = RunsCursor<RunListItem>;
+
 export interface Aggregate {
   account_id: string;
 
@@ -138,11 +149,102 @@ export interface Aggregate {
 }
 
 /**
- * A single check execution. Runs are written by the garrison that executed the
- * check; CC reads them from S3-resident parquet files for read-only public
- * exposure here.
+ * The full record for one check execution: the list fields plus the run's
+ * `metadata` (a JSON object) and the set of downloadable `artifacts`. Location is
+ * structured; no infrastructure identifiers are exposed.
  */
-export interface Run {
+export interface RunDetail {
+  /**
+   * Run typeid (`run_<26-char base32 UUIDv7>`).
+   */
+  id: string;
+
+  /**
+   * Downloadable artifacts for this run (empty when none).
+   */
+  artifacts: Array<RunDetail.Artifact>;
+
+  /**
+   * UUID of the parent check (matches `Check.id`).
+   */
+  check_id: string;
+
+  check_name: string;
+
+  duration_ms: number;
+
+  has_errors: boolean;
+
+  has_failures: boolean;
+
+  /**
+   * Execution start time in unix milliseconds (UTC).
+   */
+  started_at_unix_ms: number;
+
+  status: 'PASS' | 'FAIL' | 'ERROR' | 'TIMEOUT';
+
+  /**
+   * Check type (`http`, `tcp`, `dns`, ...).
+   */
+  type: string;
+
+  /**
+   * Reserved; always null at this version.
+   */
+  degraded?: boolean | null;
+
+  /**
+   * Full failure message; null on a passing run.
+   */
+  error_message?: string | null;
+
+  /**
+   * Human-readable location label. Null when unresolved.
+   */
+  location?: string | null;
+
+  /**
+   * Per-check-type metadata as a JSON object; null when absent.
+   */
+  metadata?: { [key: string]: unknown } | null;
+
+  /**
+   * Cloud provider that ran the check. Null when unresolved.
+   */
+  provider?: string | null;
+
+  /**
+   * Provider-native region id. Null when unresolved.
+   */
+  region?: string | null;
+}
+
+export namespace RunDetail {
+  /**
+   * One downloadable artifact for a run.
+   */
+  export interface Artifact {
+    /**
+     * Artifact kind (closed set).
+     */
+    kind: 'screenshot' | 'trace' | 'har';
+
+    /**
+     * Opaque, webapp-relative download path (`/v1/runs/{id}/artifacts/{kind}`).
+     */
+    url: string;
+  }
+}
+
+/**
+ * One check execution in a list. Location is exposed as structured
+ * `provider`/`region`/`location` fields rather than infrastructure internals; the
+ * row carries cheap boolean flags and a short `error_summary` (null on a passing
+ * run). For the full record (metadata + downloadable artifacts), fetch
+ * `GET /v1/runs/{id}`.
+ */
+export interface RunListItem {
   /**
    * Run typeid (`run_<26-char base32 UUIDv7>`).
    */
@@ -157,11 +259,9 @@ export interface Run {
 
   duration_ms: number;
 
-  garrison_id: string;
+  has_errors: boolean;
 
-  instance_id: string;
-
-  node_name: string;
+  has_failures: boolean;
 
   /**
    * Execution start time in unix milliseconds (UTC).
@@ -175,16 +275,30 @@ export interface Run {
    */
   type: string;
 
-  error_message?: string;
+  /**
+   * Reserved; always null at this version.
+   */
+  degraded?: boolean | null;
 
   /**
-   * Per-check-type metadata blob, JSON-encoded as a string.
+   * Short failure summary; null on a passing run.
    */
-  metadata?: string;
-}
+  error_summary?: string | null;
 
-export interface RunListResponse {
-  runs: Array<Run>;
+  /**
+   * Human-readable location label (e.g. `Falkenstein, DE`). Null when unresolved.
+   */
+  location?: string | null;
+
+  /**
+   * Cloud provider that ran the check (e.g. `hetzner`, `ovh`). Null when unresolved.
+   */
+  provider?: string | null;
+
+  /**
+   * Provider-native region id (e.g. `fsn1`, `gra7`). Null when unresolved.
+   */
+  region?: string | null;
 }
 
 export interface RunAggregatesResponse {
@@ -193,18 +307,19 @@ export interface RunAggregatesResponse {
 
 export type RunLogsResponse = Uploadable;
 
-export interface RunListParams {
+export interface RunListParams extends RunsCursorParams {
   /**
    * Filter to a single check (UUID; matches `Check.id`).
    */
   check_id?: string;
 
-  limit?: number;
-
-  offset?: number;
+  /**
+   * Filter to a single provider-native region id (e.g. `fsn1`).
+   */
+  location?: string;
 
   /**
-   * Lower bound on `started_at_unix_ms`. Server clamps to a 7-day window.
+   * Lower bound on `started_at_unix_ms` (inclusive).
    */
   since?: number;
 
@@ -212,6 +327,11 @@ export interface RunListParams {
    * Filter to a single execution status.
    */
   status?: 'PASS' | 'FAIL' | 'ERROR' | 'TIMEOUT';
+
+  /**
+   * Upper bound on `started_at_unix_ms` (inclusive).
+   */
+  until?: number;
 }
 
 export interface RunAggregatesParams {
@@ -249,10 +369,11 @@ export interface RunAggregatesParams {
 export declare namespace Runs {
   export {
     type Aggregate as Aggregate,
-    type Run as Run,
-    type RunListResponse as RunListResponse,
+    type RunDetail as RunDetail,
+    type RunListItem as RunListItem,
     type RunAggregatesResponse as RunAggregatesResponse,
     type RunLogsResponse as RunLogsResponse,
+    type RunListItemsRunsCursor as RunListItemsRunsCursor,
     type RunListParams as RunListParams,
     type RunAggregatesParams as RunAggregatesParams,
   };

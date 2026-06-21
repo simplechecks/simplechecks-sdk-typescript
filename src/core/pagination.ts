@@ -154,3 +154,52 @@ export class Offset<Item> extends AbstractPage<Item> implements OffsetResponse<I
     };
   }
 }
+
+export interface RunsCursorResponse<Item> {
+  runs: Array<Item>;
+
+  next_cursor: string | null;
+}
+
+export interface RunsCursorParams {
+  cursor?: string;
+
+  limit?: number;
+}
+
+export class RunsCursor<Item> extends AbstractPage<Item> implements RunsCursorResponse<Item> {
+  runs: Array<Item>;
+
+  next_cursor: string | null;
+
+  constructor(
+    client: SimpleChecks,
+    response: Response,
+    body: RunsCursorResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.runs = body.runs || [];
+    this.next_cursor = body.next_cursor || null;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.runs ?? [];
+  }
+
+  nextPageRequestOptions(): PageRequestOptions | null {
+    const cursor = this.next_cursor;
+    if (!cursor) {
+      return null;
+    }
+
+    return {
+      ...this.options,
+      query: {
+        ...maybeObj(this.options.query),
+        cursor,
+      },
+    };
+  }
+}

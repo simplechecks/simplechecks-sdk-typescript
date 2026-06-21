@@ -39,10 +39,11 @@ export { Purchases, type Purchase, type PurchaseListResponse, type PurchaseListP
 export {
   Runs,
   type Aggregate,
-  type Run,
-  type RunListResponse,
+  type RunDetail,
+  type RunListItem,
   type RunAggregatesResponse,
   type RunLogsResponse,
   type RunListParams,
   type RunAggregatesParams,
+  type RunListItemsRunsCursor,
 } from './runs';

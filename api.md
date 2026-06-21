@@ -43,15 +43,15 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/runs.ts">Aggregate</a></code>
-- <code><a href="./src/resources/runs.ts">Run</a></code>
-- <code><a href="./src/resources/runs.ts">RunListResponse</a></code>
+- <code><a href="./src/resources/runs.ts">RunDetail</a></code>
+- <code><a href="./src/resources/runs.ts">RunListItem</a></code>
 - <code><a href="./src/resources/runs.ts">RunAggregatesResponse</a></code>
 - <code><a href="./src/resources/runs.ts">RunLogsResponse</a></code>
 
 Methods:
 
-- <code title="get /v1/runs/{id}">client.runs.<a href="./src/resources/runs.ts">retrieve</a>(id) -> Run</code>
-- <code title="get /v1/runs">client.runs.<a href="./src/resources/runs.ts">list</a>({ ...params }) -> RunListResponse</code>
+- <code title="get /v1/runs/{id}">client.runs.<a href="./src/resources/runs.ts">retrieve</a>(id) -> RunDetail</code>
+- <code title="get /v1/runs">client.runs.<a href="./src/resources/runs.ts">list</a>({ ...params }) -> RunListItemsRunsCursor</code>
 - <code title="get /v1/runs/aggregates">client.runs.<a href="./src/resources/runs.ts">aggregates</a>({ ...params }) -> RunAggregatesResponse</code>
 - <code title="get /v1/runs/{id}/logs">client.runs.<a href="./src/resources/runs.ts">logs</a>(id) -> string</code>
 

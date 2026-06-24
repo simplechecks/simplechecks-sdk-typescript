@@ -2,7 +2,7 @@
 
 import { APIResource } from '../../core/resource';
 import * as AlertsAPI from './alerts';
-import { AlertReplaceParams, AlertTestFireResponse, Alerts } from './alerts';
+import { AlertReplaceParams, Alerts } from './alerts';
 import { APIPromise } from '../../core/api-promise';
 import { Offset, type OffsetParams, PagePromise } from '../../core/pagination';
 import { buildHeaders } from '../../internal/headers';
@@ -98,25 +98,13 @@ export class Checks extends APIResource {
 
 export type ChecksOffset = Offset<Check>;
 
-export interface AlertChannel {
-  /**
-   * Channel-specific destination. URL for the webhook flavors
-   * (slack/discord/teams/webhook), email address for `email`, integration key for
-   * `pagerduty`, API key for `opsgenie`.
-   */
-  target: string;
-
-  type: 'email' | 'slack' | 'discord' | 'teams' | 'webhook' | 'pagerduty' | 'opsgenie';
-
-  /**
-   * Type-specific options. Optional.
-   */
-  config?: { [key: string]: unknown };
-}
-
+/**
+ * Per-check alert _settings_ (settings-only as of the alerting entity model).
+ * Notification destinations live in first-class `/v1/alert-channels` bound to
+ * checks via `/v1/alert-subscriptions`; pause-execution windows live in
+ * `/v1/maintenance-windows`.
+ */
 export interface AlertConfig {
-  channels: Array<AlertChannel>;
-
   /**
    * Number of consecutive globally-failing observations (after M-of-N consensus
    * collapses per-location status) required before an incident fires. Default = 1 =
@@ -154,12 +142,6 @@ export interface AlertConfig {
   check_id?: string;
 
   created_at?: string;
-
-  /**
-   * Absolute-time windows during which the evaluator suppresses dispatch but still
-   * updates state. Cron-style recurring windows are a future enhancement.
-   */
-  maintenance_windows?: Array<MaintenanceWindow>;
 
   updated_at?: string;
 }
@@ -230,12 +212,6 @@ export interface Check {
   provider?: string;
 }
 
-export interface MaintenanceWindow {
-  end_unix_ms: number;
-
-  start_unix_ms: number;
-}
-
 export interface CheckCreateParams {
   enabled: boolean;
 
@@ -302,19 +278,13 @@ Checks.Alerts = Alerts;
 
 export declare namespace Checks {
   export {
-    type AlertChannel as AlertChannel,
     type AlertConfig as AlertConfig,
     type Check as Check,
-    type MaintenanceWindow as MaintenanceWindow,
     type ChecksOffset as ChecksOffset,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,
     type CheckListParams as CheckListParams,
   };
 
-  export {
-    Alerts as Alerts,
-    type AlertTestFireResponse as AlertTestFireResponse,
-    type AlertReplaceParams as AlertReplaceParams,
-  };
+  export { Alerts as Alerts, type AlertReplaceParams as AlertReplaceParams };
 }

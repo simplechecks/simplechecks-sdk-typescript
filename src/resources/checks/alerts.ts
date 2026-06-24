@@ -8,7 +8,10 @@ import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
 
 /**
- * Per-check alert configuration + test-fire endpoint (PR-Alerts/1).
+ * Per-check alert settings: consecutive-failure threshold and the
+ * M-of-N consensus parameters. Notification destinations are
+ * reusable account-scoped resources under `alert-channels`, bound to
+ * checks via `alert-subscriptions`.
  */
 export class Alerts extends APIResource {
   /**
@@ -46,11 +49,12 @@ export class Alerts extends APIResource {
   }
 
   /**
-   * Idempotent upsert. The same body shape is returned by GET. Channels supported:
-   * email, slack, discord, teams, webhook, pagerduty, opsgenie. The PR-Alerts/1
-   * evaluator runs M-of-N consensus before incident-firing; if fewer than
-   * `consensus_m` locations have observations, the rule falls back to "any failing =
-   * failing" so brand-new checks don't miss outages.
+   * Idempotent upsert. The same body shape is returned by GET. This configures alert
+   * _settings_ only (failure threshold + consensus); notification destinations live
+   * in `alert-channels`, bound via `alert-subscriptions`. The evaluator runs M-of-N
+   * consensus before incident-firing; if fewer than `consensus_m` locations have
+   * observations, the rule falls back to "any failing = failing" so brand-new checks
+   * don't miss outages.
    *
    * Eventual-consistency contract: after a config write, the evaluator picks up the
    * new thresholds on the next ingest cycle (15s push cadence).
@@ -62,7 +66,6 @@ export class Alerts extends APIResource {
    * const alertConfig = await client.checks.alerts.replace(
    *   '182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e',
    *   {
-   *     channels: [{ target: 'target', type: 'email' }],
    *     consecutive_failures_threshold: 1,
    *     consensus_m: 1,
    *     consensus_n: 1,
@@ -74,47 +77,9 @@ export class Alerts extends APIResource {
   replace(id: string, body: AlertReplaceParams, options?: RequestOptions): APIPromise<ChecksAPI.AlertConfig> {
     return this._client.put(path`/v1/checks/${id}/alerts`, { body, ...options });
   }
-
-  /**
-   * Synthesizes a `test_fire` dispatch per channel and enqueues them for the async
-   * dispatcher. Useful for verifying that a Slack webhook URL or PagerDuty
-   * integration key actually works without waiting for a real failure. The test
-   * dispatches do not affect alert state or incident lifecycle. Requires the
-   * `checks:write` scope.
-   *
-   * @example
-   * ```ts
-   * const response = await client.checks.alerts.testFire(
-   *   '182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e',
-   * );
-   * ```
-   */
-  testFire(id: string, options?: RequestOptions): APIPromise<AlertTestFireResponse> {
-    return this._client.post(path`/v1/checks/${id}/alerts:test`, options);
-  }
-}
-
-export interface AlertTestFireResponse {
-  /**
-   * Total channels configured on the check.
-   */
-  channel_count: number;
-
-  /**
-   * Number of dispatches accepted (un-deduped).
-   */
-  enqueued: number;
-
-  /**
-   * Synthetic incident id used to dedupe the test dispatches against accidental
-   * double-clicks.
-   */
-  incident_id: string;
 }
 
 export interface AlertReplaceParams {
-  channels: Array<ChecksAPI.AlertChannel>;
-
   /**
    * Number of consecutive globally-failing observations (after M-of-N consensus
    * collapses per-location status) required before an incident fires. Default = 1 =
@@ -150,17 +115,8 @@ export interface AlertReplaceParams {
    * Server-set; ignored on write.
    */
   check_id?: string;
-
-  /**
-   * Absolute-time windows during which the evaluator suppresses dispatch but still
-   * updates state. Cron-style recurring windows are a future enhancement.
-   */
-  maintenance_windows?: Array<ChecksAPI.MaintenanceWindow>;
 }
 
 export declare namespace Alerts {
-  export {
-    type AlertTestFireResponse as AlertTestFireResponse,
-    type AlertReplaceParams as AlertReplaceParams,
-  };
+  export { type AlertReplaceParams as AlertReplaceParams };
 }

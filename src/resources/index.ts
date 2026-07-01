@@ -33,7 +33,12 @@ export {
   type CheckListParams,
   type ChecksOffset,
 } from './checks/checks';
-export { Incidents, type Incident, type IncidentListResponse, type IncidentListParams } from './incidents';
+export {
+  Incidents,
+  type Incident,
+  type IncidentListParams,
+  type IncidentsIncidentsOffset,
+} from './incidents';
 export {
   Keys,
   type APIKey,

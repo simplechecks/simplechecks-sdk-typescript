@@ -155,6 +155,54 @@ export class Offset<Item> extends AbstractPage<Item> implements OffsetResponse<I
   }
 }
 
+export interface IncidentsOffsetResponse<Item> {
+  incidents: Array<Item>;
+
+  next_offset: number | null;
+}
+
+export interface IncidentsOffsetParams {
+  offset?: number;
+
+  limit?: number;
+}
+
+export class IncidentsOffset<Item> extends AbstractPage<Item> implements IncidentsOffsetResponse<Item> {
+  incidents: Array<Item>;
+
+  next_offset: number | null;
+
+  constructor(
+    client: SimpleChecks,
+    response: Response,
+    body: IncidentsOffsetResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.incidents = body.incidents || [];
+    this.next_offset = body.next_offset || null;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.incidents ?? [];
+  }
+
+  nextPageRequestOptions(): PageRequestOptions | null {
+    const offset = (this.options.query as IncidentsOffsetParams).offset ?? 0;
+    const length = this.getPaginatedItems().length;
+    const currentCount = offset + length;
+
+    return {
+      ...this.options,
+      query: {
+        ...maybeObj(this.options.query),
+        offset: currentCount,
+      },
+    };
+  }
+}
+
 export interface RunsCursorResponse<Item> {
   runs: Array<Item>;
 

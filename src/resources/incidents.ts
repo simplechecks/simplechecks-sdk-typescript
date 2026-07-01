@@ -1,7 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
-import { APIPromise } from '../core/api-promise';
+import { IncidentsOffset, type IncidentsOffsetParams, PagePromise } from '../core/pagination';
 import { RequestOptions } from '../internal/request-options';
 
 /**
@@ -31,10 +31,12 @@ export class Incidents extends APIResource {
   list(
     query: IncidentListParams | null | undefined = {},
     options?: RequestOptions,
-  ): APIPromise<IncidentListResponse> {
-    return this._client.get('/v1/incidents', { query, ...options });
+  ): PagePromise<IncidentsIncidentsOffset, Incident> {
+    return this._client.getAPIList('/v1/incidents', IncidentsOffset<Incident>, { query, ...options });
   }
 }
+
+export type IncidentsIncidentsOffset = IncidentsOffset<Incident>;
 
 /**
  * One alert-state lifecycle entry. Derived on read from `alert_state` +
@@ -64,31 +66,12 @@ export interface Incident {
   resolved_at_unix_ms?: number | null;
 }
 
-export interface IncidentListResponse {
-  incidents: Array<Incident>;
-
-  /**
-   * Offset to pass on the next request. Zero (or absent) when there's no more data.
-   */
-  next_offset?: number;
-}
-
-export interface IncidentListParams {
-  /**
-   * Max number of incidents to return. Defaults to 50; server caps at 500.
-   */
-  limit?: number;
-
-  /**
-   * Number of incidents to skip. Pass the `next_offset` from the previous page.
-   */
-  offset?: number;
-}
+export interface IncidentListParams extends IncidentsOffsetParams {}
 
 export declare namespace Incidents {
   export {
     type Incident as Incident,
-    type IncidentListResponse as IncidentListResponse,
+    type IncidentsIncidentsOffset as IncidentsIncidentsOffset,
     type IncidentListParams as IncidentListParams,
   };
 }

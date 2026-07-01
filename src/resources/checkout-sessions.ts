@@ -5,7 +5,7 @@ import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
 /**
- * Run-credit balance + Stripe Checkout for top-ups.
+ * Run-credit balance, Stripe Checkout top-ups, and purchase history.
  */
 export class CheckoutSessions extends APIResource {
   /**

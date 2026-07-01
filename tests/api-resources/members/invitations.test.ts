@@ -7,9 +7,9 @@ const client = new SimpleChecks({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource alerts', () => {
-  test('retrieve', async () => {
-    const responsePromise = client.checks.alerts.retrieve('182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e');
+describe('resource invitations', () => {
+  test('create: only required params', async () => {
+    const responsePromise = client.members.invitations.create({ email: 'dev@stainless.com', role: 'owner' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -19,8 +19,12 @@ describe('resource alerts', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('delete', async () => {
-    const responsePromise = client.checks.alerts.delete('182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e');
+  test('create: required and optional params', async () => {
+    const response = await client.members.invitations.create({ email: 'dev@stainless.com', role: 'owner' });
+  });
+
+  test('list', async () => {
+    const responsePromise = client.members.invitations.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -30,13 +34,8 @@ describe('resource alerts', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('replace: only required params', async () => {
-    const responsePromise = client.checks.alerts.replace('182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e', {
-      consecutive_failures_threshold: 1,
-      consensus_m: 1,
-      consensus_n: 1,
-      enabled: true,
-    });
+  test('revoke', async () => {
+    const responsePromise = client.members.invitations.revoke('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -44,16 +43,5 @@ describe('resource alerts', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('replace: required and optional params', async () => {
-    const response = await client.checks.alerts.replace('182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e', {
-      consecutive_failures_threshold: 1,
-      consensus_m: 1,
-      consensus_n: 1,
-      enabled: true,
-      account_id: '182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e',
-      check_id: '182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e',
-    });
   });
 });

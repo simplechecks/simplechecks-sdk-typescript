@@ -15,31 +15,73 @@ import { stringifyQuery } from './internal/utils/query';
 import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Pagination from './core/pagination';
-import { AbstractPage, type OffsetParams, OffsetResponse } from './core/pagination';
+import {
+  AbstractPage,
+  type AlertChannelsCursorParams,
+  AlertChannelsCursorResponse,
+  type AlertSubscriptionsCursorParams,
+  AlertSubscriptionsCursorResponse,
+  type IncidentsOffsetParams,
+  IncidentsOffsetResponse,
+  type MaintenanceWindowsCursorParams,
+  MaintenanceWindowsCursorResponse,
+  type OffsetParams,
+  OffsetResponse,
+  type RunsCursorParams,
+  RunsCursorResponse,
+} from './core/pagination';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import { Account, AccountResource } from './resources/account';
+import {
+  AlertChannel,
+  AlertChannelCreateParams,
+  AlertChannelListParams,
+  AlertChannelTestFireResponse,
+  AlertChannelUpdateParams,
+  AlertChannels,
+  AlertChannelsAlertChannelsCursor,
+} from './resources/alert-channels';
+import {
+  AlertSubscription,
+  AlertSubscriptionCreateParams,
+  AlertSubscriptionListParams,
+  AlertSubscriptionUpdateParams,
+  AlertSubscriptions,
+  AlertSubscriptionsAlertSubscriptionsCursor,
+} from './resources/alert-subscriptions';
 import { Balance, BalanceResource } from './resources/balance';
 import {
   CheckoutSession,
   CheckoutSessionCreateParams,
   CheckoutSessions,
 } from './resources/checkout-sessions';
-import { Incident, IncidentListParams, IncidentListResponse, Incidents } from './resources/incidents';
+import { Incident, IncidentListParams, Incidents, IncidentsIncidentsOffset } from './resources/incidents';
 import { APIKey, KeyCreateParams, KeyCreateResponse, KeyListResponse, Keys } from './resources/keys';
+import { Location, LocationListResponse, Locations } from './resources/locations';
+import {
+  MaintenanceWindow,
+  MaintenanceWindowCreateParams,
+  MaintenanceWindowListParams,
+  MaintenanceWindowUpdateParams,
+  MaintenanceWindows,
+  MaintenanceWindowsMaintenanceWindowsCursor,
+} from './resources/maintenance-windows';
+import { Pricing, PricingResource } from './resources/pricing';
+import { Purchase, PurchaseListParams, PurchaseListResponse, Purchases } from './resources/purchases';
 import {
   Aggregate,
-  Run,
   RunAggregatesParams,
   RunAggregatesResponse,
+  RunDetail,
+  RunListItem,
+  RunListItemsRunsCursor,
   RunListParams,
-  RunListResponse,
   RunLogsResponse,
   Runs,
 } from './resources/runs';
 import {
-  AlertChannel,
   AlertConfig,
   Check,
   CheckCreateParams,
@@ -47,8 +89,14 @@ import {
   CheckUpdateParams,
   Checks,
   ChecksOffset,
-  MaintenanceWindow,
 } from './resources/checks/checks';
+import {
+  Invitation,
+  Member,
+  MemberListResponse,
+  MemberUpdateParams,
+  Members,
+} from './resources/members/members';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -751,11 +799,19 @@ export class SimpleChecks {
     return () => controller.abort();
   }
 
-  private buildBody({ options: { body, headers: rawHeaders } }: { options: FinalRequestOptions }): {
+  private buildBody({ options }: { options: FinalRequestOptions }): {
     bodyHeaders: HeadersLike;
     body: BodyInit | undefined;
   } {
+    const { body, headers: rawHeaders } = options;
     if (!body) {
+      // A resource method always passes a `body` key when its operation defines a
+      // request body, even if the caller omitted an optional body param. Keep the
+      // content-type for those, and only elide it for operations with no body at
+      // all (e.g. GET/DELETE).
+      if (body == null && 'body' in options) {
+        return this.#encoder({ body, headers: buildHeaders([rawHeaders]) });
+      }
       return { bodyHeaders: undefined, body: undefined };
     }
     const headers = buildHeaders([rawHeaders]);
@@ -836,13 +892,58 @@ export class SimpleChecks {
    */
   keys: API.Keys = new API.Keys(this);
   /**
-   * Run-credit balance + Stripe Checkout for top-ups.
+   * Reusable, account-scoped notification destinations (webhook,
+   * Slack, Discord, Teams, PagerDuty, Opsgenie, email). One channel
+   * can serve many checks. Includes a test-fire endpoint.
+   *
+   */
+  alertChannels: API.AlertChannels = new API.AlertChannels(this);
+  /**
+   * Bindings of a check to an alert channel, each carrying its own
+   * notify-on-failure / notify-on-recovery flags.
+   *
+   */
+  alertSubscriptions: API.AlertSubscriptions = new API.AlertSubscriptions(this);
+  /**
+   * Account-scoped windows that pause execution of their targeted
+   * checks for the scheduled interval(s); paused runs are not recorded
+   * and never count against uptime.
+   *
+   */
+  maintenanceWindows: API.MaintenanceWindows = new API.MaintenanceWindows(this);
+  /**
+   * Run-credit balance, Stripe Checkout top-ups, and purchase history.
    */
   balance: API.BalanceResource = new API.BalanceResource(this);
   /**
-   * Run-credit balance + Stripe Checkout for top-ups.
+   * Run-credit balance, Stripe Checkout top-ups, and purchase history.
    */
   checkoutSessions: API.CheckoutSessions = new API.CheckoutSessions(this);
+  /**
+   * Run-credit balance, Stripe Checkout top-ups, and purchase history.
+   */
+  purchases: API.Purchases = new API.Purchases(this);
+  /**
+   * Manage who has access to an account and at what role
+   * (PR-Members/2). Five roles: owner / admin / member / billing /
+   * viewer. Owner is the strict superset of all other roles' scopes;
+   * every account always has at least one owner.
+   *
+   */
+  members: API.Members = new API.Members(this);
+  /**
+   * Catalog of (provider, location) deployments Simple Checks runs
+   * checks from, with geographic metadata + live status. Used to
+   * drive the region picker and the dashboard's locations map.
+   *
+   */
+  locations: API.Locations = new API.Locations(this);
+  /**
+   * Active token-pricing table: per-check-type weights and the
+   * customer-facing provider cost multipliers. Reads are free.
+   *
+   */
+  pricing: API.PricingResource = new API.PricingResource(this);
 }
 
 SimpleChecks.AccountResource = AccountResource;
@@ -850,8 +951,15 @@ SimpleChecks.Checks = Checks;
 SimpleChecks.Runs = Runs;
 SimpleChecks.Incidents = Incidents;
 SimpleChecks.Keys = Keys;
+SimpleChecks.AlertChannels = AlertChannels;
+SimpleChecks.AlertSubscriptions = AlertSubscriptions;
+SimpleChecks.MaintenanceWindows = MaintenanceWindows;
 SimpleChecks.BalanceResource = BalanceResource;
 SimpleChecks.CheckoutSessions = CheckoutSessions;
+SimpleChecks.Purchases = Purchases;
+SimpleChecks.Members = Members;
+SimpleChecks.Locations = Locations;
+SimpleChecks.PricingResource = PricingResource;
 
 export declare namespace SimpleChecks {
   export type RequestOptions = Opts.RequestOptions;
@@ -859,14 +967,39 @@ export declare namespace SimpleChecks {
   export import Offset = Pagination.Offset;
   export { type OffsetParams as OffsetParams, type OffsetResponse as OffsetResponse };
 
+  export import IncidentsOffset = Pagination.IncidentsOffset;
+  export {
+    type IncidentsOffsetParams as IncidentsOffsetParams,
+    type IncidentsOffsetResponse as IncidentsOffsetResponse,
+  };
+
+  export import RunsCursor = Pagination.RunsCursor;
+  export { type RunsCursorParams as RunsCursorParams, type RunsCursorResponse as RunsCursorResponse };
+
+  export import AlertChannelsCursor = Pagination.AlertChannelsCursor;
+  export {
+    type AlertChannelsCursorParams as AlertChannelsCursorParams,
+    type AlertChannelsCursorResponse as AlertChannelsCursorResponse,
+  };
+
+  export import AlertSubscriptionsCursor = Pagination.AlertSubscriptionsCursor;
+  export {
+    type AlertSubscriptionsCursorParams as AlertSubscriptionsCursorParams,
+    type AlertSubscriptionsCursorResponse as AlertSubscriptionsCursorResponse,
+  };
+
+  export import MaintenanceWindowsCursor = Pagination.MaintenanceWindowsCursor;
+  export {
+    type MaintenanceWindowsCursorParams as MaintenanceWindowsCursorParams,
+    type MaintenanceWindowsCursorResponse as MaintenanceWindowsCursorResponse,
+  };
+
   export { AccountResource as AccountResource, type Account as Account };
 
   export {
     Checks as Checks,
-    type AlertChannel as AlertChannel,
     type AlertConfig as AlertConfig,
     type Check as Check,
-    type MaintenanceWindow as MaintenanceWindow,
     type ChecksOffset as ChecksOffset,
     type CheckCreateParams as CheckCreateParams,
     type CheckUpdateParams as CheckUpdateParams,
@@ -876,10 +1009,11 @@ export declare namespace SimpleChecks {
   export {
     Runs as Runs,
     type Aggregate as Aggregate,
-    type Run as Run,
-    type RunListResponse as RunListResponse,
+    type RunDetail as RunDetail,
+    type RunListItem as RunListItem,
     type RunAggregatesResponse as RunAggregatesResponse,
     type RunLogsResponse as RunLogsResponse,
+    type RunListItemsRunsCursor as RunListItemsRunsCursor,
     type RunListParams as RunListParams,
     type RunAggregatesParams as RunAggregatesParams,
   };
@@ -887,7 +1021,7 @@ export declare namespace SimpleChecks {
   export {
     Incidents as Incidents,
     type Incident as Incident,
-    type IncidentListResponse as IncidentListResponse,
+    type IncidentsIncidentsOffset as IncidentsIncidentsOffset,
     type IncidentListParams as IncidentListParams,
   };
 
@@ -899,6 +1033,34 @@ export declare namespace SimpleChecks {
     type KeyCreateParams as KeyCreateParams,
   };
 
+  export {
+    AlertChannels as AlertChannels,
+    type AlertChannel as AlertChannel,
+    type AlertChannelTestFireResponse as AlertChannelTestFireResponse,
+    type AlertChannelsAlertChannelsCursor as AlertChannelsAlertChannelsCursor,
+    type AlertChannelCreateParams as AlertChannelCreateParams,
+    type AlertChannelUpdateParams as AlertChannelUpdateParams,
+    type AlertChannelListParams as AlertChannelListParams,
+  };
+
+  export {
+    AlertSubscriptions as AlertSubscriptions,
+    type AlertSubscription as AlertSubscription,
+    type AlertSubscriptionsAlertSubscriptionsCursor as AlertSubscriptionsAlertSubscriptionsCursor,
+    type AlertSubscriptionCreateParams as AlertSubscriptionCreateParams,
+    type AlertSubscriptionUpdateParams as AlertSubscriptionUpdateParams,
+    type AlertSubscriptionListParams as AlertSubscriptionListParams,
+  };
+
+  export {
+    MaintenanceWindows as MaintenanceWindows,
+    type MaintenanceWindow as MaintenanceWindow,
+    type MaintenanceWindowsMaintenanceWindowsCursor as MaintenanceWindowsMaintenanceWindowsCursor,
+    type MaintenanceWindowCreateParams as MaintenanceWindowCreateParams,
+    type MaintenanceWindowUpdateParams as MaintenanceWindowUpdateParams,
+    type MaintenanceWindowListParams as MaintenanceWindowListParams,
+  };
+
   export { BalanceResource as BalanceResource, type Balance as Balance };
 
   export {
@@ -906,4 +1068,27 @@ export declare namespace SimpleChecks {
     type CheckoutSession as CheckoutSession,
     type CheckoutSessionCreateParams as CheckoutSessionCreateParams,
   };
+
+  export {
+    Purchases as Purchases,
+    type Purchase as Purchase,
+    type PurchaseListResponse as PurchaseListResponse,
+    type PurchaseListParams as PurchaseListParams,
+  };
+
+  export {
+    Members as Members,
+    type Invitation as Invitation,
+    type Member as Member,
+    type MemberListResponse as MemberListResponse,
+    type MemberUpdateParams as MemberUpdateParams,
+  };
+
+  export {
+    Locations as Locations,
+    type Location as Location,
+    type LocationListResponse as LocationListResponse,
+  };
+
+  export { PricingResource as PricingResource, type Pricing as Pricing };
 }

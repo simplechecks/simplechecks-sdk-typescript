@@ -154,3 +154,256 @@ export class Offset<Item> extends AbstractPage<Item> implements OffsetResponse<I
     };
   }
 }
+
+export interface IncidentsOffsetResponse<Item> {
+  incidents: Array<Item>;
+
+  next_offset: number | null;
+}
+
+export interface IncidentsOffsetParams {
+  offset?: number;
+
+  limit?: number;
+}
+
+export class IncidentsOffset<Item> extends AbstractPage<Item> implements IncidentsOffsetResponse<Item> {
+  incidents: Array<Item>;
+
+  next_offset: number | null;
+
+  constructor(
+    client: SimpleChecks,
+    response: Response,
+    body: IncidentsOffsetResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.incidents = body.incidents || [];
+    this.next_offset = body.next_offset || null;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.incidents ?? [];
+  }
+
+  nextPageRequestOptions(): PageRequestOptions | null {
+    const offset = (this.options.query as IncidentsOffsetParams).offset ?? 0;
+    const length = this.getPaginatedItems().length;
+    const currentCount = offset + length;
+
+    return {
+      ...this.options,
+      query: {
+        ...maybeObj(this.options.query),
+        offset: currentCount,
+      },
+    };
+  }
+}
+
+export interface RunsCursorResponse<Item> {
+  runs: Array<Item>;
+
+  next_cursor: string | null;
+}
+
+export interface RunsCursorParams {
+  cursor?: string;
+
+  limit?: number;
+}
+
+export class RunsCursor<Item> extends AbstractPage<Item> implements RunsCursorResponse<Item> {
+  runs: Array<Item>;
+
+  next_cursor: string | null;
+
+  constructor(
+    client: SimpleChecks,
+    response: Response,
+    body: RunsCursorResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.runs = body.runs || [];
+    this.next_cursor = body.next_cursor || null;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.runs ?? [];
+  }
+
+  nextPageRequestOptions(): PageRequestOptions | null {
+    const cursor = this.next_cursor;
+    if (!cursor) {
+      return null;
+    }
+
+    return {
+      ...this.options,
+      query: {
+        ...maybeObj(this.options.query),
+        cursor,
+      },
+    };
+  }
+}
+
+export interface AlertChannelsCursorResponse<Item> {
+  alert_channels: Array<Item>;
+
+  next_cursor: string | null;
+}
+
+export interface AlertChannelsCursorParams {
+  cursor?: string;
+
+  limit?: number;
+}
+
+export class AlertChannelsCursor<Item>
+  extends AbstractPage<Item>
+  implements AlertChannelsCursorResponse<Item>
+{
+  alert_channels: Array<Item>;
+
+  next_cursor: string | null;
+
+  constructor(
+    client: SimpleChecks,
+    response: Response,
+    body: AlertChannelsCursorResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.alert_channels = body.alert_channels || [];
+    this.next_cursor = body.next_cursor || null;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.alert_channels ?? [];
+  }
+
+  nextPageRequestOptions(): PageRequestOptions | null {
+    const cursor = this.next_cursor;
+    if (!cursor) {
+      return null;
+    }
+
+    return {
+      ...this.options,
+      query: {
+        ...maybeObj(this.options.query),
+        cursor,
+      },
+    };
+  }
+}
+
+export interface AlertSubscriptionsCursorResponse<Item> {
+  alert_subscriptions: Array<Item>;
+
+  next_cursor: string | null;
+}
+
+export interface AlertSubscriptionsCursorParams {
+  cursor?: string;
+
+  limit?: number;
+}
+
+export class AlertSubscriptionsCursor<Item>
+  extends AbstractPage<Item>
+  implements AlertSubscriptionsCursorResponse<Item>
+{
+  alert_subscriptions: Array<Item>;
+
+  next_cursor: string | null;
+
+  constructor(
+    client: SimpleChecks,
+    response: Response,
+    body: AlertSubscriptionsCursorResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.alert_subscriptions = body.alert_subscriptions || [];
+    this.next_cursor = body.next_cursor || null;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.alert_subscriptions ?? [];
+  }
+
+  nextPageRequestOptions(): PageRequestOptions | null {
+    const cursor = this.next_cursor;
+    if (!cursor) {
+      return null;
+    }
+
+    return {
+      ...this.options,
+      query: {
+        ...maybeObj(this.options.query),
+        cursor,
+      },
+    };
+  }
+}
+
+export interface MaintenanceWindowsCursorResponse<Item> {
+  maintenance_windows: Array<Item>;
+
+  next_cursor: string | null;
+}
+
+export interface MaintenanceWindowsCursorParams {
+  cursor?: string;
+
+  limit?: number;
+}
+
+export class MaintenanceWindowsCursor<Item>
+  extends AbstractPage<Item>
+  implements MaintenanceWindowsCursorResponse<Item>
+{
+  maintenance_windows: Array<Item>;
+
+  next_cursor: string | null;
+
+  constructor(
+    client: SimpleChecks,
+    response: Response,
+    body: MaintenanceWindowsCursorResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.maintenance_windows = body.maintenance_windows || [];
+    this.next_cursor = body.next_cursor || null;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.maintenance_windows ?? [];
+  }
+
+  nextPageRequestOptions(): PageRequestOptions | null {
+    const cursor = this.next_cursor;
+    if (!cursor) {
+      return null;
+    }
+
+    return {
+      ...this.options,
+      query: {
+        ...maybeObj(this.options.query),
+        cursor,
+      },
+    };
+  }
+}

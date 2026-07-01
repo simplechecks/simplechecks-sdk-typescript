@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.3.0 (2026-07-01)
+
+Full Changelog: [v0.2.0...v0.3.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.2.0...v0.3.0)
+
+### Features
+
+* **api:** api update ([e209568](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/e20956837ada42350072d90ee8aa89317c9cedca))
+* **api:** api update ([21923da](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/21923da3a5394d3012761dc4e7bfe208e9f974b0))
+* **api:** api update ([811b981](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/811b981b780424e7997c86d6632224f1473fecd1))
+* **api:** api update ([896bc88](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/896bc88b43f4a9b864581959cd68cb3725a073c3))
+* **api:** api update ([0b7246d](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/0b7246d57a617fbe57c74a9034296056ab213255))
+* **api:** api update ([05b8207](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/05b8207a830ef3d2bb18d68d089296f0140b78a8))
+* **api:** api update ([1791210](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/17912106db2109fcd7fa6880f99b9edd507696aa))
+* **api:** api update ([56afd7e](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/56afd7eef48aea3e0d7803571e3c09df3a3a34b9))
+* **api:** api update ([585ab60](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/585ab60d53fe99d199487d58fb9ffa25e105f6d2))
+
+
+### Bug Fixes
+
+* **client:** send content-type header for requests with an omitted optional body ([2fa80ac](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/2fa80ac29549f60b8d290ba5e597c879f17b98a7))
+* **typescript:** upgrade tsc-multi so that it works with Node 26 ([397b83a](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/397b83aaed73cb8c13575d51d60256da77e6cef2))
+
+
+### Chores
+
+* **internal:** codegen related update ([fa9ce6a](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/fa9ce6a5f93e8e158ef6dd3a89b40e3ba7ac1647))
+* **tests:** remove redundant File import ([678c45d](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/678c45d33bfcebf8a0eb61514b621cc87831efc9))
+
 ## 0.2.0 (2026-05-10)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.1.0...v0.2.0)

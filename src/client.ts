@@ -21,6 +21,8 @@ import {
   AlertChannelsCursorResponse,
   type AlertSubscriptionsCursorParams,
   AlertSubscriptionsCursorResponse,
+  type IncidentsOffsetParams,
+  IncidentsOffsetResponse,
   type MaintenanceWindowsCursorParams,
   MaintenanceWindowsCursorResponse,
   type OffsetParams,
@@ -55,7 +57,7 @@ import {
   CheckoutSessionCreateParams,
   CheckoutSessions,
 } from './resources/checkout-sessions';
-import { Incident, IncidentListParams, IncidentListResponse, Incidents } from './resources/incidents';
+import { Incident, IncidentListParams, Incidents, IncidentsIncidentsOffset } from './resources/incidents';
 import { APIKey, KeyCreateParams, KeyCreateResponse, KeyListResponse, Keys } from './resources/keys';
 import { Location, LocationListResponse, Locations } from './resources/locations';
 import {
@@ -965,6 +967,12 @@ export declare namespace SimpleChecks {
   export import Offset = Pagination.Offset;
   export { type OffsetParams as OffsetParams, type OffsetResponse as OffsetResponse };
 
+  export import IncidentsOffset = Pagination.IncidentsOffset;
+  export {
+    type IncidentsOffsetParams as IncidentsOffsetParams,
+    type IncidentsOffsetResponse as IncidentsOffsetResponse,
+  };
+
   export import RunsCursor = Pagination.RunsCursor;
   export { type RunsCursorParams as RunsCursorParams, type RunsCursorResponse as RunsCursorResponse };
 
@@ -1013,7 +1021,7 @@ export declare namespace SimpleChecks {
   export {
     Incidents as Incidents,
     type Incident as Incident,
-    type IncidentListResponse as IncidentListResponse,
+    type IncidentsIncidentsOffset as IncidentsIncidentsOffset,
     type IncidentListParams as IncidentListParams,
   };
 

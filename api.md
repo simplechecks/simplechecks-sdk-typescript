@@ -53,11 +53,10 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/incidents.ts">Incident</a></code>
-- <code><a href="./src/resources/incidents.ts">IncidentListResponse</a></code>
 
 Methods:
 
-- <code title="get /v1/incidents">client.incidents.<a href="./src/resources/incidents.ts">list</a>({ ...params }) -> IncidentListResponse</code>
+- <code title="get /v1/incidents">client.incidents.<a href="./src/resources/incidents.ts">list</a>({ ...params }) -> IncidentsIncidentsOffset</code>
 
 # Keys
 

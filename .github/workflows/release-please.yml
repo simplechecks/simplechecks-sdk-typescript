@@ -1,0 +1,22 @@
+name: release-please
+# NOTE: stlc ships no release-please example; authored here against the
+# release-please-config.json + .release-please-manifest.json already committed
+# in this repo. VALIDATE the action ref and any extra wiring against the
+# transition "Releasing SDKs" doc page before the first tag-cut.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    if: github.repository == 'simplechecks/simplechecks-sdk-typescript'
+    steps:
+      - uses: stainless-api/release-please-action@main   # VALIDATE ref vs docs
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

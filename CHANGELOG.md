@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.1 (2026-07-05)
+
+Full Changelog: [v0.3.0...v0.3.1](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.3.0...v0.3.1)
+
+### Bug Fixes
+
+* **ci:** pin release-please action to v3.8.1 ([f6e814c](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/f6e814c33d2b0b448118f0a96ec4ac9e49492ec3))
+
+
+### Chores
+
+* **ci:** add stlc release workflows (U9) ([1e00faa](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/1e00faa83e57e7875fcce228528eb4279770c8e2))
+
+
+### Styles
+
+* **ci:** prettier-format U9 workflow files ([ef5a106](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/ef5a106a9ae9ce672889ee67cf096e4bdba76ffc))
+
 ## 0.3.0 (2026-07-01)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.2.0...v0.3.0)

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.3.0...v0.3.1) (2026-07-05)
+
+
+### Bug Fixes
+
+* **ci:** pin release-please action to v3.8.1 ([f6e814c](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/f6e814c33d2b0b448118f0a96ec4ac9e49492ec3))
+* **ci:** supply release-type to release-please ([bdcb123](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/bdcb1235a53f77e3c2725b085e2903745921d829))
+
 ## 0.3.0 (2026-07-01)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.2.0...v0.3.0)

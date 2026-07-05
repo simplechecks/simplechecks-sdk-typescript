@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'simplechecks/simplechecks-sdk-typescript'
     steps:
-      - uses: stainless-api/release-please-action@v3.8.1  # pinned latest (confirm vs "Releasing SDKs" doc)
+      - uses: stainless-api/release-please-action@v3.8.1 # pinned latest (confirm vs "Releasing SDKs" doc)
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json

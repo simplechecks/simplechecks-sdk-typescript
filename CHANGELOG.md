@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.4.0 (2026-08-20)
+
+Full Changelog: [v0.3.0...v0.4.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.3.0...v0.4.0)
+
+### Features
+
+* **api:** api update ([ae62fe6](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/ae62fe66703feca5bcce0fb0d47f49f5ed9ca2ef))
+
+
+### Bug Fixes
+
+* **ci:** bump @arethetypeswrong/cli to ^0.18.0 and run CI workflows on Node 24 ([646e14d](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/646e14d1fae3252b507e12ab89c9efca627110b9))
+* **ci:** pin release-please action to v3.8.1 ([f6e814c](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/f6e814c33d2b0b448118f0a96ec4ac9e49492ec3))
+* **ci:** supply release-type to release-please ([bdcb123](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/bdcb1235a53f77e3c2725b085e2903745921d829))
+* **stlc:** stop hand-edited CI workflows from blocking seals and builds ([90e120f](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/90e120fdede96484d3119f6604b8385be14754a5))
+
+
+### Chores
+
+* **ci:** add stlc release workflows (U9) ([1e00faa](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/1e00faa83e57e7875fcce228528eb4279770c8e2))
+* **internal:** allow the mock server port to be set with STAINLESS_MOCK_PORT ([a420206](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/a42020617d0cf062509c0d2e73cec097ac03bde8))
+* **internal:** codegen related update ([6ac680b](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/6ac680b4f04950b3a4e1b6ffa71fcd237e5304d5))
+
+
+### Documentation
+
+* **api:** clarify getCheck response body ([b98ca3f](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/b98ca3f385149fbf5d6eb056fdebbad5f3a80130))
+
+
+### Styles
+
+* **ci:** prettier-format U9 workflow files ([ef5a106](https://github.com/simplechecks/simplechecks-sdk-typescript/commit/ef5a106a9ae9ce672889ee67cf096e4bdba76ffc))
+
 ## 0.3.0 (2026-07-01)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/simplechecks/simplechecks-sdk-typescript/compare/v0.2.0...v0.3.0)
